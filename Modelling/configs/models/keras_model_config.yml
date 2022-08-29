@@ -1,0 +1,36 @@
+# Training info
+training_name: keras_feed_forward
+random_seed: 42 # sets seed for model initiation
+
+# Model info
+model: keras_feed_forward
+# Any specific args for the model
+args: {
+  nr_of_epochs: 130,
+  optimizer: "adam",
+  loss: "binary_crossentropy",
+  metrics: ["accuracy", "mean_squared_error"],
+
+  # Configure the model architecture.
+  layers: [ # Only dense layers are supported currently.
+    {
+      type: "dense",
+      size: 16,
+      activation: "relu",
+    },
+    {
+      type: "dense",
+      size: 10,
+      activation: "relu",
+    },
+    { # For binary classification the final layer must be size 1 with sigmoid activation.
+      type: "dense",
+      size: 1,
+      activation: "sigmoid"
+    }
+  ]
+}
+
+# Data info
+preprocessed_data_path: data/preprocessed/data_20220710-191849/data/train_data.csv
+gt_column: "Treatment_Outcome"

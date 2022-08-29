@@ -1,0 +1,16 @@
+Eli5 XGBoost weights
+ Explained as: feature importances
+
+XGBoost feature importances; values are numbers 0 <= x <= 1;
+all values sum to 1.
+
+0.2188  MSI
+0.0941  DCB_genes
+0.0941  Diagnosis_Age
+0.0938  NDB_genes
+0.0933  Histology
+0.0899  Smoking_History
+0.0893  TMB_norm_log2
+0.0878  Study_ID
+0.0730  Pan_2020_compound_muts
+0.0660  Sex

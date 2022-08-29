@@ -1,0 +1,8 @@
+training_name: xgboost_model
+random_seed: 42
+model: xgboost
+args:
+  tree_method: hist
+  enable_categorical: true
+preprocessed_data_path: data/preprocessed/categorical_preprocess_20220826-105835/data/train_data.csv
+gt_column: Treatment_Outcome

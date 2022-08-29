@@ -1,0 +1,9 @@
+# Preprocessing meta info
+preprocessor_name: "davids_non_null_one_hotted" #"davids_preprocessor"
+test_set_size: 0.2 # Part of data. 1 is all data.
+random_seed: 42 # sets seed for training/test set splits
+output_name: numerical_preprocess
+
+# Data info
+data_path: data/all_features_control_included.tsv
+studies_to_exclude: ["Jordan_2017", "Model_Control"]

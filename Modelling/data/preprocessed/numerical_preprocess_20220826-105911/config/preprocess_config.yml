@@ -1,0 +1,8 @@
+preprocessor_name: davids_non_null_one_hotted
+test_set_size: 0.2
+random_seed: 42
+output_name: numerical_preprocess
+data_path: data/all_features_control_included.tsv
+studies_to_exclude:
+- Jordan_2017
+- Model_Control

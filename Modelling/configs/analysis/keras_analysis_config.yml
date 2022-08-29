@@ -1,0 +1,60 @@
+# Analysis configuration.
+
+# Metrics like Accuracy, Precision, Recall and F1-score.
+metrics: true
+
+# Eli5 to explain model weights. Must provide a model path.
+# DOES NOT WORK WITH KERAS FEED FORWARD NETWORK.
+explain_model_weights_eli5: false
+
+# List of confusion matrices to plot.
+confusion_matrix: [
+  {
+  output_name: "confusion_matrix",
+  ground_truth_col: "Treatment_Outcome",
+  prediction_col: "predicted" 
+  }
+]
+
+# List of histograms to plot. Any nan values will be dropped.
+histogram: [
+  {
+  output_name: "age_histogram",
+  column: "Diagnosis_Age",
+  type: "continuous",
+  plotargs: {
+    bins: 30,
+    title: "Diagnosis Age"
+    }
+  }
+]
+
+# List of scatterplots to plot. Any nan values will be dropped.
+scatter_plot: [
+  {
+    output_name: "Diagnosis_Age_vs_TMB_norm_log2__scatter_plot",
+    x_column: "Diagnosis_Age",
+    y_column: "TMB_norm_log2",
+    color_column: "Treatment_Outcome"
+  }
+]
+
+# List of TSNE reductions to plot. Only works with numerical data.
+tsne_2d: [
+  {
+    output_name: "tsne_gt",
+    groupby: "Treatment_Outcome", # Decides the color separation.
+    columns: ["Diagnosis_Age",
+              "Pan_2020_compound_muts",
+              "DCB_genes",
+              "NDB_genes",
+              "TMB_norm_log2",
+              "Histology_Lung Adenocarcinoma",
+              "Histology_Lung Squamous Cell Carcinoma",
+              "Histology_Non-Small Cell Lung Cancer",
+              "Smoking_Current/Former",
+              "Smoking_Former",
+              "Smoking_Never",
+              "Sex_Male"],
+  }
+]

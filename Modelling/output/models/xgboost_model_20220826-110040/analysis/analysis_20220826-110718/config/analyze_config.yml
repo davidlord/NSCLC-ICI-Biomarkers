@@ -1,0 +1,33 @@
+metrics: true
+explain_model_weights_eli5: true
+confusion_matrix:
+- output_name: confusion_matrix
+  ground_truth_col: Treatment_Outcome
+  prediction_col: predicted
+histogram:
+- output_name: age_histogram
+  column: Diagnosis_Age
+  type: continuous
+  plotargs:
+    bins: 30
+    title: Diagnosis Age
+- output_name: smoking_histogram
+  column: Smoking_History
+  type: categorical
+  plotargs:
+    title: Smoking history
+    xtick_label_rotation: 45
+scatter_plot:
+- output_name: age_vs_smoking_history__scatter_plot
+  x_column: Diagnosis_Age
+  y_column: Smoking_History
+  color_column: predicted
+- output_name: MSI_vs_TMB_norm_log2__scatter_plot
+  x_column: MSI
+  y_column: TMB_norm_log2
+  color_column: Treatment_Outcome
+- output_name: Diagnosis_Age_vs_TMB_norm_log2__scatter_plot
+  x_column: Diagnosis_Age
+  y_column: TMB_norm_log2
+  color_column: Treatment_Outcome
+prediction_data_path: xgboost_inference.csv
