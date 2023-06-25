@@ -65,7 +65,6 @@ def remove_commented_lines(path_list, name):
         print("Successfully removed commented lines from: " + file_path)
 
 
-
 # Read file that matches name in path into dictionary of dataframes
 # Loop over directories included
 def read_data(path_list, name, data_dict):
@@ -73,10 +72,9 @@ def read_data(path_list, name, data_dict):
     # Read data files:
         file_path = os.path.join(path, name)
         if os.path.isfile(file_path):
-            df = pd.read_csv(file_path, header=0, delimiter='\t')
+            df = pd.read_csv(file_path, header=0, delimiter='\t', low_memory=False)
             data_dict[path] = df
             print("Successfully read: " + file_path)
-
 
 
 # Add column containing study name to each df
@@ -84,14 +82,6 @@ def add_dataframe_name_column(dataframes_dict):
     for df_name in dataframes_dict:
         df = dataframes_dict[df_name]
         df['study_name'] = re.search(r'(?<=Data\/).*', df_name).group()
-
-
-def remove_nonsense_rows(dataframes_dict):
-    for df_name in dataframes_dict:
-        df = dataframes_dict[df_name]
-        df = df.iloc[4:]
-        dataframes_dict[df_name] = df
-    
 
 
 # Concatinate dataframes in dict into single dataframe: 
@@ -105,18 +95,24 @@ def concatinate_dfs(df_dict):
 
 
 
-
 #===============================================================
 # RUN FUNCTIONS ON DATA
 #===============================================================
 
-# Get path to directories included in data folder
+# GET PATH to directories included in data folder
 data_included = get_data_dirs(data_path)
 
-# Remove commented lines from mutations data files
+
+# REMOVE COMMENTED LINES from mutations data files
+    # Clinical data: 
+remove_commented_lines(data_included, clinical_file_name)
+    # Sample data: 
+remove_commented_lines(data_included, sample_file_name)
+    # Mutational data:
 remove_commented_lines(data_included, mutation_file_name)
 
-# Define dictionaries to store dataframes
+
+# DEFINE DICTIONARIES to store dataframes
 clinical_dfs = {}
 sample_dfs = {}
 mutation_dfs = {}
@@ -131,33 +127,63 @@ read_data(data_included, sample_file_name, sample_dfs)
 read_data(data_included, mutation_file_name, mutation_dfs)
     
 
-# FILTER nonsense rows from dataframes
-    # Clinical data:
-remove_nonsense_rows(clinical_dfs)
-
-# ADD STUDY NAME as column do dataframes in dictionaries
+# ADD STUDY NAME as column to dataframes in dictionaries
     # Clinical data: 
 add_dataframe_name_column(clinical_dfs)
+    # Sample data: 
+add_dataframe_name_column(sample_dfs)
     # Mutational data: 
+add_dataframe_name_column(mutation_dfs)
+
 
 # CONCATINATE DATAFRAMES in dicts into single dataframe
     # Clinical data:
 all_clinical_data = concatinate_dfs(clinical_dfs)
+    # Sample data: 
+all_sample_data = concatinate_dfs(sample_dfs)
+    # Mutational data:
+all_mutations_data = concatinate_dfs(mutation_dfs)
+
+
+# AIM
+#--------
+
+# Now time for some data engineering :)
+
+# We want a dataset in which each row represents a patient and mutations of interests are columns. 
+# However, mutations are currently manifested as rows in the mutations df. 
+
+# The sample dataset is needed to link information together between the clinical df 
+# and mutational df, see data relations information below for details. 
+
+# IDEA: 
+    
+    # Define a list of genes of interest, place in other file.
+    
+    # Go through mutations df, keep only rows in which Hugo_Symbol matches a gene in list.
+    
+    # Transpose mutations df, keeping only columns of interest. 
+    
 
 
 
+# DATA RELATIONS BETWEEN TABLES:
+#-----------------------------------------
+# JOIN DATAFRAMES to single dataset
+# CLINICAL DATA: PK = "PATIENT_ID"
+# SAMPLE DATA: PK = "SAMPLE_ID", FK on Clinical = "PATIENT_ID"
+# MUTATIONS DATA: FK on Sample = "Tumor_Sample_Barcode"
+
+
+# COLUMNS OF INTEREST: 
+#-----------------------
+# CLINICAL DATA: 
+# SAMPLE DATA: 
+#MUTATIONS DATA: "Hugo_Symbol", "Consequence", "Variant_Type", and "Tumor_Sample_Barcode"
 
 
 
-#===============================================================
-# UNDER DEVELOPMENT
-#===============================================================
-
-# Read mutations table into df
-mutations_df = pd.read_csv('Data/nsclc_mskcc_2018/data_mutations_mskcc.txt', header=0, delimiter='\t')
-
-# read sample tables 
-
+# WRITE FILES: Concatinated dataframes
 
 
 
@@ -166,14 +192,7 @@ mutations_df = pd.read_csv('Data/nsclc_mskcc_2018/data_mutations_mskcc.txt', hea
 #===============================================================
 
 
-# Usage example:
-file_path = './Data/luad_mskimpact_2021/data_mutations.txt'
-remove_commented_lines(file_path)
 
-
-# Unable to read the mutations file from luad_mskimpact_2021 for some reason
-file_path = "./Data/luad_mskimpact_2021/data_mutations.txt"
-test_df = pd.read_csv(file_path, header=0, delimiter='\t')
 
 
 

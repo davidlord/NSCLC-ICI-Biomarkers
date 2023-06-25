@@ -1,7 +1,3 @@
-#Patient Identifier	Sex	Diagnosis Age	Smoker	Lines of treatment	IRB	Treatment Type	Progress Free Survival (Months)	Progression Free Status	Durable Clinical Benefit
-#Identifier to uniquely specify a patient.	Sex	Age at which a condition or disease was first diagnosed.	Indicates if person is a smoker.	Lines of treatment	IRB	Treatment Type	Progress Free Survival (Months)	Progression Free Status	Durable Clinical Benefit
-#STRING	STRING	NUMBER	STRING	STRING	STRING	STRING	NUMBER	STRING	STRING
-#1	1	0	1	1	1	1	1	1	1
 PATIENT_ID	SEX	AGE	SMOKER	LINES_OF_TX	IRB	TREATMENT_TYPE	PFS_MONTHS	PFS_STATUS	DURABLE_CLINICAL_BENEFIT
 P-0000012	Female	58	Ever	1	Clinical trial	Combination	27.2	0:Not Progressed	YES
 P-0000082	Male	60	Ever	4	Clinical trial	Monotherapy	14.5	1:Progressed	YES

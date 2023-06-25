@@ -1,7 +1,3 @@
-#Patient Identifier	Age (yrs)	Sex	Smoking Status	Histology	PD-L1 expression (Percentage)	Progress Free Survival (Months)	Progression Free Status	Best Overall Response	Durable Clinical Benefit	ECOG performance status	Nonsynonymous Mutation Burden	Predicted neoantigen burden
-#Identifier to uniquely specify a patient.	Age (yrs)	Sex	Smoking Status (cigarettes only)	Histology	PD-L1 expression (Percentage)	Progress Free Survival (Months)	Progression Free Status	Best Overall Response	Durable Clinical Benefit	ECOG performance status	Nonsynonymous Mutation Burden	Predicted neoantigen burden
-#STRING	NUMBER	STRING	STRING	STRING	NUMBER	NUMBER	STRING	STRING	STRING	STRING	NUMBER	NUMBER
-#1	1	1	1	1	1	1	1	1	1	1	1	1
 PATIENT_ID	AGE_YRS	SEX	SMOKING_STATUS	HISTOLOGY	PDL1_EXP	PFS_MONTHS	PFS_STATUS	BEST_OVERALL_RESPONSE	DURABLE_CLINICAL_BENEFIT	ECOG_PERFORMANCE_STATUS	NONSYNONYMOUS_MUTATION_BURDEN	PREDICTED_NEOANTIGEN_BURDEN
 nsclc_mskcc_2018p1	70	Female	Former	Non-Squamous	2.0	1.4127	1:Event	PD	No Durable Benefit	0	60	160
 nsclc_mskcc_2018p2	72	Male	Former	Squamous	98.0	6.8008	1:Event	PR	Durable Clinical Benefit	0	210	216

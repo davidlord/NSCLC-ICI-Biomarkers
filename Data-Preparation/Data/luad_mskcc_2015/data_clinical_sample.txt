@@ -1,7 +1,3 @@
-#Patient Identifier	Sample Identifier	Oncotree Code	Cancer Type	Cancer Type Detailed	Note	Somatic Status	TMB (nonsynonymous)
-#Identifier to uniquely specify a patient.	A unique sample identifier.	Oncotree Code	Cancer Type	Cancer Type Detailed	Note.	Somatic Status	TMB (nonsynonymous)
-#STRING	STRING	STRING	STRING	STRING	STRING	STRING	NUMBER
-#1	1	1	1	1	1	1	1
 PATIENT_ID	SAMPLE_ID	ONCOTREE_CODE	CANCER_TYPE	CANCER_TYPE_DETAILED	NOTE	SOMATIC_STATUS	TMB_NONSYNONYMOUS
 luad_mskcc_2015_1	SA9755	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	38.8
 luad_mskcc_2015_2	HE3202	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	24.1333333333

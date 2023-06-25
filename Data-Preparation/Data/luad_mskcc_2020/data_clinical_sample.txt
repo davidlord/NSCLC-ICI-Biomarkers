@@ -1,7 +1,3 @@
-#Sample Identifier	Patient Identifier	Pathologic Nodal Status	Pathologic Stage	Subtype Group	Predominant Histologic Subtype	FGA Facets	Tumor Mutation Burden	Oncotree Code	Cancer Type	Cancer Type Detailed	TMB (nonsynonymous)
-#A unique sample identifier.	Identifier to uniquely specify a patient.	Pathologic Nodal Status	Pathologic Stage	Subtype Group	Predominant Histologic Subtype	FGA Facets	Total number of mutations divided by the length of the total genomic target region captured (mutations/Mbs)	Oncotree Code	Cancer Type	Cancer Type Detailed	TMB (nonsynonymous)
-#STRING	STRING	STRING	STRING	STRING	STRING	NUMBER	NUMBER	STRING	STRING	STRING	NUMBER
-#1	1	1	1	1	1	1	1	1	1	1	1
 SAMPLE_ID	PATIENT_ID	PN_STATUS	PATHOLOGIC_STAGE	SUBTYPE_GROUP	PREDOMINANT_HISTOLOGIC_SUBTYPE	FGA_FACETS	TMB	ONCOTREE_CODE	CANCER_TYPE	CANCER_TYPE_DETAILED	TMB_NONSYNONYMOUS
 P-0000219-T01-IM3	P-0000219	Positive	3	Micropapillary/ Solid	Solid	0.190381903	4.5	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	4.43662120239
 P-0000280-T01-IM3	P-0000280	Negative	1	Acinar/ Papillary	Acinar	0.571482099	3.3	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	2.2183106012

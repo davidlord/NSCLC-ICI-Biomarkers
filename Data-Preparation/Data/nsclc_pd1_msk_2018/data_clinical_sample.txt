@@ -1,7 +1,3 @@
-#Patient Identifier	Sample Identifier	Gene Panel	Oncotree Code	Mutation Rate	FGA	PD-L1 Score (%)	Cancer Type	Cancer Type Detailed	Somatic Status	TMB (nonsynonymous)
-#Identifier to uniquely specify a patient.	A unique sample identifier.	Gene panel.	Oncotree Code	Mutation Rate	FGA	PD-L1 Score in percent	Cancer Type	Cancer Type Detailed	Somatic Status	TMB (nonsynonymous)
-#STRING	STRING	STRING	STRING	NUMBER	NUMBER	NUMBER	STRING	STRING	STRING	NUMBER
-#1	1	1	1	1	1	1	1	1	1	1
 PATIENT_ID	SAMPLE_ID	GENE_PANEL	ONCOTREE_CODE	MUTATION_RATE	FGA	PDL1_SCORE	CANCER_TYPE	CANCER_TYPE_DETAILED	SOMATIC_STATUS	TMB_NONSYNONYMOUS
 P-0000012	P-0000012-T03-IM3	IMPACT341	LUAD	30.6122449	0.18		Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Matched	32.1655037173
 P-0000082	P-0000082-T01-IM3	IMPACT341	LUAD	1.020408163	0.36	100	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Matched	1.1091553006
