@@ -30,16 +30,11 @@ sample_file_name = 'data_clinical_sample.txt'
 mutation_file_name = 'data_mutations.txt'
 
 
-# Can remove this re? 
-# Define regular expression to get study name from path
-study_name_re = r'(?<=Data\/).*'
-
 
 #===============================================================
 # DEFINE FUNCTIONS
 #===============================================================
                 
-
 # Create a list of study data included in Data folder
 def get_data_dirs(directory):
     data_dirs = []
@@ -54,11 +49,28 @@ def get_data_dirs(directory):
     return data_dirs
 
 
-# Read file that matches name in path into dictionary of dataframe
+# Remove commented lines (start with '#') from data files
+def remove_commented_lines(path_list, name):
+    for path in path_list:
+        # Define file paths
+        file_path = os.path.join(path, name)
+        # read files
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+        # Write file, keep only lines that do not start with '#'
+        keep_lines = [line for line in lines if not line.startswith('#')]
+        
+        with open(file_path, 'w') as file:
+            file.writelines(keep_lines)
+        print("Successfully removed commented lines from: " + file_path)
+
+
+
+# Read file that matches name in path into dictionary of dataframes
 # Loop over directories included
 def read_data(path_list, name, data_dict):
     for path in path_list:
-    # Read clinical data files:
+    # Read data files:
         file_path = os.path.join(path, name)
         if os.path.isfile(file_path):
             df = pd.read_csv(file_path, header=0, delimiter='\t')
@@ -101,10 +113,14 @@ def concatinate_dfs(df_dict):
 # Get path to directories included in data folder
 data_included = get_data_dirs(data_path)
 
+# Remove commented lines from mutations data files
+remove_commented_lines(data_included, mutation_file_name)
+
 # Define dictionaries to store dataframes
 clinical_dfs = {}
 sample_dfs = {}
 mutation_dfs = {}
+
 
 # READ DATA tables into dictionary of dataframes
     # Clinical data: 
@@ -141,6 +157,27 @@ all_clinical_data = concatinate_dfs(clinical_dfs)
 mutations_df = pd.read_csv('Data/nsclc_mskcc_2018/data_mutations_mskcc.txt', header=0, delimiter='\t')
 
 # read sample tables 
+
+
+
+
+#===============================================================
+# DEBUG
+#===============================================================
+
+
+# Usage example:
+file_path = './Data/luad_mskimpact_2021/data_mutations.txt'
+remove_commented_lines(file_path)
+
+
+# Unable to read the mutations file from luad_mskimpact_2021 for some reason
+file_path = "./Data/luad_mskimpact_2021/data_mutations.txt"
+test_df = pd.read_csv(file_path, header=0, delimiter='\t')
+
+
+
+
 
 
 
