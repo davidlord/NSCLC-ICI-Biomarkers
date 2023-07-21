@@ -16,18 +16,42 @@ os.getcwd()
 os.chdir('/Users/davidlord/Documents/GitHub/NSCLC-ICI-Biomarkers/Data-Preparation')
 
 
+
 #===============================================================
 # DEFINE PARAMETERS
 #===============================================================
 # DEV: Move some of these to config file
 
-# Relative path to data folders
+mutations_file_path = "mutations.txt"
+
+# Relative path to data folders directory
 data_path = './Data'
 
-# File names: 
+# File names from cBioPortal: 
 clinical_file_name = 'data_clinical_patient.txt'
 sample_file_name = 'data_clinical_sample.txt'
 mutation_file_name = 'data_mutations.txt'
+
+
+
+#===============================================================
+# READ MUTATIONS REFERENCE FILE
+#===============================================================
+
+# Read contents of mutations text file
+with open(mutations_file_path, "r") as file:
+    file_content = file.read()
+
+# Split the content by commas and create a list of mutations of interest
+mutations_of_interest_list = file_content.split(",")
+
+# removw leading/trailing whitespaces
+mutations_of_interest_list = [item.strip() for item in mutations_of_interest_list]
+
+# Print mutations of interest
+print("Mutations of interest specified in file: ")
+for mut in mutations_of_interest_list:
+    print(mut)
 
 
 
@@ -144,6 +168,21 @@ all_sample_data = concatinate_dfs(sample_dfs)
     # Mutational data:
 all_mutations_data = concatinate_dfs(mutation_dfs)
 
+
+# FILTER mutations not included in mutations of interest list
+mutations_filtered = all_mutations_data[all_mutations_data['Hugo_Symbol'].isin(mutations_of_interest_list)]
+
+
+# DEVELOPMENT
+
+
+# Keep only top 10 rows
+
+temp_df = mutations_filtered.head(10)
+
+transposed_df = temp_df.T
+
+transposed_df = transposed_df.set_axis(transposed_df.iloc[0], axis=1)
 
 # AIM
 #--------
