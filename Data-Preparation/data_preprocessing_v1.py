@@ -173,16 +173,18 @@ all_mutations_data = concatinate_dfs(mutation_dfs)
 mutations_filtered = all_mutations_data[all_mutations_data['Hugo_Symbol'].isin(mutations_of_interest_list)]
 
 
-# DEVELOPMENT
+#####    DEV     #######
 
-
-# Keep only top 10 rows
-
+# Create simplified dataframe of 10 rows
 temp_df = mutations_filtered.head(10)
 
-transposed_df = temp_df.T
+# FILTER to KEEP only relevant columns
+temp_df = temp_df[['Tumor_Sample_Barcode', 'Hugo_Symbol', 'Variant_Type', 'Consequence']]
 
-transposed_df = transposed_df.set_axis(transposed_df.iloc[0], axis=1)
+
+
+
+#####    DEV     #######
 
 # AIM
 #--------
@@ -199,9 +201,17 @@ transposed_df = transposed_df.set_axis(transposed_df.iloc[0], axis=1)
     
     # Define a list of genes of interest, place in other file.
     
-    # Go through mutations df, keep only rows in which Hugo_Symbol matches a gene in list.
+    # Go through mutations df, keep only rows in which Hugo_Symbol matches a gene in list
+        # Store in temp_df
     
-    # Transpose mutations df, keeping only columns of interest. 
+    # Join patient and sample tables to joined_df
+    
+    # Add mutation names in mutations_of_interest_list as columns to joined_df
+    
+    # For each row in joined_df
+        # if joined_df[tumor_sample_barcode] = temp_df[tumor_sample_barcode]
+            # tempvar = temp_df[Hugo_Symbol]
+            # joined_df[tempvar] = TRUE
     
 
 
