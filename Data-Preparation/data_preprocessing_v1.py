@@ -10,6 +10,7 @@ import os
 import re
 import pandas as pd
 import glob
+import subprocess
 
 
 os.getcwd()
@@ -118,6 +119,16 @@ def concatinate_dfs(df_dict):
     return concatinated_df
 
 
+# Check if column_names.txt file exists or not
+def check_column_names_file():
+    file_name = 'column_names.txt'
+    if os.path.isfile(file_name):
+        return True
+    else:
+        return False
+    
+    
+
 
 #===============================================================
 # RUN FUNCTIONS ON DATA
@@ -169,8 +180,78 @@ all_sample_data = concatinate_dfs(sample_dfs)
 all_mutations_data = concatinate_dfs(mutation_dfs)
 
 
-# FILTER mutations not included in mutations of interest list
-mutations_filtered = all_mutations_data[all_mutations_data['Hugo_Symbol'].isin(mutations_of_interest_list)]
+# JOIN clinical- and sample dataframes to single
+patient_sample_data = pd.merge(all_clinical_data, all_sample_data, on='PATIENT_ID', how='left')
+
+
+column_names = patient_sample_data.columns
+# CHECK for 'column_names.txt' file
+# If file is NOT PRESENT: WRITE THE FILE and provide INFO
+if check_column_names_file() == False:
+    column_names = patient_sample_data.columns
+    print('bye')
+
+
+### DEV: Alter behaviour using ArgParse...
+
+
+
+##### DEV #########
+
+# Keep only relevant columns in all_mutations data
+
+
+# Filter to keep only MUTATIONS of interest in all_mutations data
+
+
+
+# Create a new df ("sample_temp_df") holdinhg a subset of columns from sample df. 
+
+# For each gene of interest in genes_of_interest_list: 
+    # Add gene_name as column to sample_temp_df, set all values to empty string or something
+
+
+
+# For each row in sample_temp_df: 
+    # If all_mutations_df[SAMPLE_ID] == sample_temp_df[SAMPLE_ID]
+        # tempvar = all_mutations_df[Hugo_Symbol]
+        # sample_temp_df[tempvar] = all_mutations_df[Consequence
+        
+        
+# Then somehow relate sample_temp_df to clinical data...
+
+#------------------
+
+# KEEP only RELEVANT columns in mutations data:
+all_mutations_data = all_mutations_data[['Tumor_Sample_Barcode', 'Hugo_Symbol', 'Consequence', 'Mutation_Status']]
+
+# FILTER: KEEP only genes defined in GENES OF INTEREST LIST
+mutations_data = all_mutations_data[all_mutations_data['Hugo_Symbol'].isin(mutations_of_interest_list)]
+
+
+
+
+
+
+
+
+
+
+### DEV #####
+# HOW TO DEAL WITH MULTIPLE SAMPLES / PATIENT???
+
+# MERGE samples and patients table to single: 
+    sample_patient_df = pd.merge(all_sample_data, all_clinical_data, on='PATIENT_ID', how='inner')
+    
+    
+    # Investigate duplicates
+    duplicate_rows = sample_patient_df[sample_patient_df.duplicated(subset='PATIENT_ID', keep=False)]
+    dup_sample_patients = sample_patient_df.duplicated(subset=['PATIENT_ID'])
+    
+    duplicates_specific_cols = df.duplicated(subset=['column1', 'column2'])
+    
+
+
 
 
 #####    DEV     #######
@@ -180,6 +261,8 @@ temp_df = mutations_filtered.head(10)
 
 # FILTER to KEEP only relevant columns
 temp_df = temp_df[['Tumor_Sample_Barcode', 'Hugo_Symbol', 'Variant_Type', 'Consequence']]
+
+
 
 
 
