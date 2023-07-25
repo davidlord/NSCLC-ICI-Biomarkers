@@ -24,6 +24,7 @@ os.chdir('/Users/davidlord/Documents/GitHub/NSCLC-ICI-Biomarkers/Data-Preparatio
 # DEV: Move some of these to config file
 
 mutations_file_path = "mutations.txt"
+column_names_file_path = "column_names.txt"
 
 # Relative path to data folders directory
 data_path = './Data'
@@ -59,7 +60,10 @@ for mut in mutations_of_interest_list:
 #===============================================================
 # DEFINE FUNCTIONS
 #===============================================================
-                
+
+# FOR BOTH INSTANCES
+#------------------------
+
 # Create a list of study data included in Data folder
 def get_data_dirs(directory):
     data_dirs = []
@@ -127,23 +131,50 @@ def check_column_names_file():
     else:
         return False
     
+
+    
+# FOR DATA ASSESSMENT MODULE
+#------------------------------
+
+# SEARCH for FILENAME
+def search_file_in_current_directory(filename):
+    current_directory = os.getcwd()
+
+    for root, _, files in os.walk(current_directory):
+        for file in files:
+            if file == filename:
+                return os.path.join(root, file)
+
+    return None
+
+# WRITE COLUMN NAMES to text file
+def write_column_names_to_text_file(dataframe, output_file_path):
+    try:
+        with open(output_file_path, 'w') as text_file:
+            column_names = dataframe.columns.tolist()
+            for column_name in column_names:
+                text_file.write(column_name + '\n')
+        print(f"Column names written to '{output_file_path}' successfully.")
+    except Exception as e:
+        print(f"Error occurred while writing to the text file: {e}")
+    
     
 
 
 #===============================================================
-# RUN FUNCTIONS ON DATA
+# EXECUTE FUNCTIONS: BOTH INSTANCES
 #===============================================================
 
 # GET PATH to directories included in data folder
 data_included = get_data_dirs(data_path)
 
 
-# REMOVE COMMENTED LINES from mutations data files
+# REMOVE COMMENTED LINES from data files
     # Clinical data: 
 remove_commented_lines(data_included, clinical_file_name)
     # Sample data: 
 remove_commented_lines(data_included, sample_file_name)
-    # Mutational data:
+    # Mutations data:
 remove_commented_lines(data_included, mutation_file_name)
 
 
@@ -152,24 +183,21 @@ clinical_dfs = {}
 sample_dfs = {}
 mutation_dfs = {}
 
-
 # READ DATA tables into dictionary of dataframes
     # Clinical data: 
 read_data(data_included, clinical_file_name, clinical_dfs)
     # Sample data:
 read_data(data_included, sample_file_name, sample_dfs)
-    # Mutational data: 
+    # Mutations data: 
 read_data(data_included, mutation_file_name, mutation_dfs)
-    
 
 # ADD STUDY NAME as column to dataframes in dictionaries
     # Clinical data: 
 add_dataframe_name_column(clinical_dfs)
     # Sample data: 
 add_dataframe_name_column(sample_dfs)
-    # Mutational data: 
+    # Mutations data:
 add_dataframe_name_column(mutation_dfs)
-
 
 # CONCATINATE DATAFRAMES in dicts into single dataframe
     # Clinical data:
@@ -179,9 +207,42 @@ all_sample_data = concatinate_dfs(sample_dfs)
     # Mutational data:
 all_mutations_data = concatinate_dfs(mutation_dfs)
 
-
 # JOIN clinical- and sample dataframes to single
 patient_sample_data = pd.merge(all_clinical_data, all_sample_data, on='PATIENT_ID', how='left')
+
+
+#===============================================================
+# EXECUTE FUNCTIONS: DATA ASSESSMENT MODULE
+#===============================================================
+
+# Output vis of NA data in patient-sample data
+
+# Check for existing colnames file
+
+
+search_file_in_current_directory(column_names_file_path)
+
+
+found_file_path = search_file_in_current_directory(column_names_file_path)
+
+if found_file_path:
+    print(f"Found '{column_names_file_path}' at: {found_file_path}")
+else:
+    print(f"'{column_names_file_path}' not found in the current directory.")
+
+
+# WRITE COLUMN NAMES to text file
+write_column_names_to_text_file(patient_sample_data, column_names_file_path)
+
+
+
+
+
+#===============================================================
+# EXECUTE FUNCTIONS: WRITE DATASET MODULE
+#===============================================================
+
+
 
 
 column_names = patient_sample_data.columns
