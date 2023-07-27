@@ -76,8 +76,40 @@ class Preprocessor:
                 df = df.iloc[4:]
                 dataframes_dict[df_name] = df
         # Concatinate dataframes in dict into single dataframe: 
+        def renaming_fun(x):
+            if x.startswith("AGE"):
+                return "Diagnosis_Age" # or None
+            if x.startswith("SEX"):
+                return "Sex"
+            if x.startswith("SMOK"):
+                return "Smoking_History"
+            if x.startswith("PDL"):
+                return "PD-L1_Expression"
+            if x.endswith("BURDEN"):
+                return "TMB"
+            else:
+                return x
         def concatinate_dfs(df_dict):
             dfs = []
+            cols_list = []
+            lst = []
+            mylist = ['Patient_id','study_name','Sex','Histology','Age','TMB','PDL1','Smoking_history','smoking', 'smoker', 'nonsynonymous_mutation_burden', 'Tumor', 'durable_clinical_benefit','Treatment','PFS']
+            mylist_lower = [i.lower() for i in mylist] 
+            for df in df_dict.values():
+                dfs.append(df)
+                for i in dfs:
+                    cols_list.append(i.columns.tolist())
+                    cols_list_low = [[x.casefold() for x in sublst] for sublst in cols_list]
+            for k in mylist_lower:
+                has_match = False
+                for j in cols_list_low:
+                    lst.append([item for item in j if item.startswith(k.split()[0])])
+            flat_list = [num for sublist in lst for num in sublist]
+            flat_list_upper = [y.upper() for y in set(flat_list)]
+            for df in df_dict:
+                df_dict[df] = df_dict[df][df_dict[df].columns & flat_list_upper]
+                df_dict[df] = df_dict[df].rename(columns=renaming_fun)
+                df_dict[df] = df_dict[df].loc[:, ~df_dict[df].columns.duplicated(keep='first')]
             for df in df_dict.values():
                 dfs.append(df)
                 concatinated_df = pd.concat(dfs, ignore_index = True)  
@@ -98,10 +130,9 @@ class Preprocessor:
         # Mutational data: 
         # CONCATINATE DATAFRAMES in dicts into single dataframe
         #Clinical data:
+        add_dataframe_name_column(clinical_dfs)
         all_clinical_data = concatinate_dfs(clinical_dfs)
         # ADD STUDY NAME as column do dataframes in dictionaries
-         # Clinical data: 
-        add_dataframe_name_column(clinical_dfs)
         model_input = {}
         def create_gene_cols(path_list, sample_concat_dict , mutation_concat_dict , mutationMerged_dict):
             model_frame = []
