@@ -87,6 +87,8 @@ class Preprocessor:
                 return "PD-L1_Expression"
             if x.endswith("BURDEN"):
                 return "TMB"
+            if x.endswith("DURABLE"):
+                return "Treatment_Outcome"
             else:
                 return x
         def concatinate_dfs(df_dict):
