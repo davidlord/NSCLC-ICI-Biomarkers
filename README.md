@@ -7,7 +7,8 @@ The identification of certain biomarkers that correlate with immunotherapy treat
 This code repository contains two packages: "Data-Preparation" and "Modelling". The function of each of these is explained below. 
 
 ### Data Preparation
-A framework for preprocessing cancer genomics datasets from the cBioPortal. 
+A framework for compiling and preparing cancer genomics datasets from the cBioPortal. Source code compiles multiple separate datasets to a single analysis-ready dataset. Requires input from subject matter experts before and while executing the code for: defining gene-mutations of interest, defining columns of interest, and harmonizing categorical columns. 
+
 
 ### Modelling
-A framework for creating predictive models of d
+A framework for creating predictive models of NSCLC immunotherapy treatment outcome. 
