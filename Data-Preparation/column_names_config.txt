@@ -1,0 +1,2 @@
+# Please define columns represent the same information in this text file following the example below
+# Example: TMB = NONSYNONYMOUS_MUTATION_BURDEN, TMB_NONSYNONYMOUS, TOTAL_EXONIC_MUTATION_BURDEN

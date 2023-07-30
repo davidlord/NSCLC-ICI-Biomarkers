@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon May  1 19:01:44 2023
-
 @author: davidlord
 """
 # Import packages:
@@ -11,6 +10,9 @@ import re
 import pandas as pd
 import glob
 import subprocess
+import matplotlib.pyplot as plt
+import seaborn as sns
+import openpyxl
 
 
 os.getcwd()
@@ -24,7 +26,8 @@ os.chdir('/Users/davidlord/Documents/GitHub/NSCLC-ICI-Biomarkers/Data-Preparatio
 # DEV: Move some of these to config file
 
 mutations_file_path = "mutations.txt"
-column_names_file_path = "column_names.txt"
+column_names_file = "column_names.txt"
+column_names_config_file = "column_names_config.txt"
 
 # Relative path to data folders directory
 data_path = './Data'
@@ -138,27 +141,35 @@ def check_column_names_file():
 
 # SEARCH for FILENAME
 def search_file_in_current_directory(filename):
+    file_status = False
     current_directory = os.getcwd()
 
     for root, _, files in os.walk(current_directory):
         for file in files:
             if file == filename:
                 return os.path.join(root, file)
+                file_status = True
 
-    return None
-
-# WRITE COLUMN NAMES to text file
-def write_column_names_to_text_file(dataframe, output_file_path):
+    return file_status
+    
+    
+# WRITE text file 
+def write_txt_file(text_body, output_file_path):
     try:
         with open(output_file_path, 'w') as text_file:
-            column_names = dataframe.columns.tolist()
-            for column_name in column_names:
-                text_file.write(column_name + '\n')
-        print(f"Column names written to '{output_file_path}' successfully.")
+            text_file.write(text_body)
     except Exception as e:
         print(f"Error occurred while writing to the text file: {e}")
     
     
+    
+    
+
+# FOR GENE MUTATIONS DATASET
+#--------------------------------
+
+
+
 
 
 #===============================================================
@@ -215,24 +226,55 @@ patient_sample_data = pd.merge(all_clinical_data, all_sample_data, on='PATIENT_I
 # EXECUTE FUNCTIONS: DATA ASSESSMENT MODULE
 #===============================================================
 
+# DEFINE column names string
+column_names_string = ""
+column_names = patient_sample_data.columns.tolist()
+for column_name in column_names:
+    column_names_string = column_names_string + column_name + '\n'
+    
+# WRITE column names text file
+write_txt_file(column_names_string, column_names_file)
+
+# DEFINE column names config string
+column_names_config_string = "# Please define the columns that represent the same information in this text file following the example rows below, excluding hashes\n"
+column_names_config_string = column_names_config_string + "# TMB = TMB, NONSYNONYMOUS_MUTATION_BURDEN, TMB_NONSYNONYMOUS, TOTAL_EXONIC_MUTATION_BURDEN\n"
+column_names_config_string = column_names_config_string + "# AGE = AGE, AGE_CURRENT, AGE_AT_SURGERY, AGE_YRS, AGE_AT_SEQ_REPORTED_YEARS"
+
+
+# SEARCH for column names config file
+if search_file_in_current_directory(column_names_config_file) is False:
+    write_txt_file(column_names_config_string, column_names_config_file)
+    print("column_names_config.txt not found")
+    print("File written: column_names_config.txt")
+
+
+
+# WRITE column names config string
+
+
+# Check for column_names_config.txt
+
+# If not present
+#   write: colnames + extra info, instructions on how to set up...
+# If present
+#   Read
+
+
+
 # Output vis of NA data in patient-sample data
 
 # Check for existing colnames file
 
 
-search_file_in_current_directory(column_names_file_path)
 
 
-found_file_path = search_file_in_current_directory(column_names_file_path)
 
-if found_file_path:
+if config_file_status:
     print(f"Found '{column_names_file_path}' at: {found_file_path}")
 else:
     print(f"'{column_names_file_path}' not found in the current directory.")
 
 
-# WRITE COLUMN NAMES to text file
-write_column_names_to_text_file(patient_sample_data, column_names_file_path)
 
 
 
@@ -241,8 +283,6 @@ write_column_names_to_text_file(patient_sample_data, column_names_file_path)
 #===============================================================
 # EXECUTE FUNCTIONS: WRITE DATASET MODULE
 #===============================================================
-
-
 
 
 column_names = patient_sample_data.columns
