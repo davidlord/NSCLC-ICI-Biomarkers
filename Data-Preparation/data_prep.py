@@ -14,8 +14,6 @@ import seaborn as sns
 import openpyxl
 
 
-
-
 os.getcwd()
 os.chdir('/Users/davidlord/Documents/GitHub/NSCLC-ICI-Biomarkers/Data-Preparation')
 
@@ -27,7 +25,6 @@ os.chdir('/Users/davidlord/Documents/GitHub/NSCLC-ICI-Biomarkers/Data-Preparatio
 # Move some of these to config file?
 
 mutations_file_path = "mutations.txt"
-column_names_file = "column_names.txt"
 column_names_config_file = "column_names_config.txt"
 
 
@@ -38,28 +35,6 @@ data_path = './Data'
 clinical_file_name = 'data_clinical_patient.txt'
 sample_file_name = 'data_clinical_sample.txt'
 mutation_file_name = 'data_mutations.txt'
-
-
-
-#===============================================================
-# READ MUTATIONS REFERENCE FILE
-#===============================================================
-
-# Read contents of mutations text file
-with open(mutations_file_path, "r") as file:
-    file_content = file.read()
-
-# Split the content by commas and create a list of mutations of interest
-mutations_of_interest_list = file_content.split(",")
-
-# removw leading/trailing whitespaces
-mutations_of_interest_list = [item.strip() for item in mutations_of_interest_list]
-
-# Print mutations of interest
-print("Mutations of interest specified in file: ")
-for mut in mutations_of_interest_list:
-    print(mut)
-
 
 
 #===============================================================
@@ -135,11 +110,15 @@ def check_column_names_file():
         return True
     else:
         return False
-    
 
-    
-# SPECIFIC FOR ASSESSMENT MODULE
-#---------------------------------
+# READ lines from text file
+def read_lines_from_file(filename):
+    lines = []
+    with open(filename, 'r') as file:
+        for line in file:
+            lines.append(line.strip())
+    return lines
+
 
 # SEARCH for FILENAME
 def search_file_in_current_directory(filename):
@@ -162,18 +141,73 @@ def write_txt_file(text_body, output_file_path):
             text_file.write(text_body)
     except Exception as e:
         print(f"Error occurred while writing to the text file: {e}")
-    
-    
 
-# SPECIFIC FOR GENERATE DATASET MODULE
-#---------------------------------------
+# WAIT for confirmation
+def wait_for_confirmation():
+    while True:
+        user_input = input("Please enter 'y' or 'Y' to continue: ")
+        if user_input.lower() == 'y':
+            break
+        else:
+            print("Invalid input. Please try again.")
 
+    print("User confirmed. Proceeding with further code execution...")
+    # Put your code here that you want to execute after the user confirms with 'y' or 'Y'
+
+
+# PARSE column_name_harmonization.txt
+def parse_column_name_harmonization(file_path):
+    parsed_dict = {}
+    with open(file_path, 'r') as file:
+        for line in file:
+            line = line.strip()
+            if not line.startswith('#'):
+                key, values = line.split('=', 1)
+                key = key.strip()
+                values = [value.strip() for value in values.split(',')]
+                parsed_dict[key] = values
+    return parsed_dict
+
+# CHANGE column names based on dictionary of lists
+def change_column_names(df_partitions_dict, parsed_dict):
+    for df_key, df in df_partitions_dict.items():
+        for column_name in df.columns:
+            for key, value_list in parsed_dict.items():
+                if column_name in value_list:
+                    new_column_name = key
+                    df.rename(columns={column_name: new_column_name}, inplace=True)
+
+
+# WRITE column entries in harmonized column names df
+def write_categorical_columns_to_file(df, output_file):
+    # Select only the categorical columns in the DataFrame
+    categorical_columns = df.select_dtypes(include='category').columns
+
+    # Open the output file in write mode
+    with open(output_file, 'w') as file:
+        # Loop through each categorical column
+        for column_name in categorical_columns:
+            file.write(f"{column_name}: ")
+            unique_entries = df[column_name].unique()
+            entries_str = ", ".join(map(str, unique_entries))
+            file.write(entries_str)
+            file.write("\n")
 
 
 
 #===============================================================
-# EXECUTE FUNCTIONS: DATA PREPARATION
+# EXECUTE FUNCTIONS
 #===============================================================
+
+
+# DATA PREPARATION
+#====================================================================
+
+# REAT MUTATIONS of interest text file
+mutations_of_interest_list = read_lines_from_file("mutations.txt")
+print("Mutations of interest specified in file: ")
+for mut in mutations_of_interest_list:
+    print(mut)
 
 # GET PATH to directories included in data folder
 data_included = get_data_dirs(data_path)
@@ -221,57 +255,160 @@ all_mutations_data = concatinate_dfs(mutation_dfs)
 patient_sample_data = pd.merge(all_clinical_data, all_sample_data, on='PATIENT_ID', how='left')
 
 
-#===============================================================
-# EXECUTE FUNCTIONS: DATA ASSESSMENT MODULE
-#===============================================================
+# GET USER INPUT TO DEFINE DATA PROCESSING
+#====================================================================
+### DEV ###
 
+# STEP 1: Get input for relevant columns
+#-----------------------------------------------
+
+# Visualize NA values in joined df
+#-----------------------------------------------
+
+# Count NA entries
+na_counts = patient_sample_data.isna().sum()
+
+# Create a bar plot
+plt.figure(figsize=(10, 6))
+sns.barplot(x=na_counts.index, y=na_counts.values)
+plt.xticks(rotation=90)
+plt.title("NA Entries in Dataset")
+plt.xlabel("Columns")
+plt.ylabel("Number of NA Entries")
+plt.tight_layout()  # To avoid labels being cut off in saved image
+plt.savefig("na_bar_plot.png")
+plt.close()  # Close the figure to free up memory
+
+# Create a heatmap for NA values
+plt.figure(figsize=(8, 6))
+sns.heatmap(df.isna(), cmap="viridis", cbar=False, yticklabels=False)
+plt.title("NA Values Heatmap")
+plt.tight_layout()  # To avoid labels being cut off in saved image
+plt.savefig("na_heatmap.png")
+plt.close()  # Close the figure to free up memory
+
+# WRITE COLUMN names text files
 # DEFINE column names string
 column_names_string = ""
 column_names = patient_sample_data.columns.tolist()
 for column_name in column_names:
     column_names_string = column_names_string + column_name + '\n'
-    
-# WRITE column names text file
-write_txt_file(column_names_string, column_names_file)
+
+
+# WRITE column names text file and one for columns of interest
+write_txt_file(column_names_string, "column_names.txt")
+print("File written: column_names.txt")
+
+write_txt_file(column_names_string, "columns_of_interest.txt")
+
+# PRINT instructions
+print('---------------------------------')
+print("File written: columns_of_interest.txt")
+print('Please open the "columns_of_interest.txt" file, remove remove columns that are not of interest, and save file')
+print('See the "na_bar_plot.png" and the "na_heatmap.png" files in the current directory to view how many entries of each column is missing data')
+print("Please do this before proceeding to the next step.")
+print('---------------------------------')
+
+
+# WAIT for user to provide input
+wait_for_confirmation()
+
+
+# STEP 2: Get input for column harmonization
+#----------------------------------------------
+
+# READ columns of interest txt file
+keep_cols = read_lines_from_file("columns_of_interest.txt")
+
+# FILTER: Keep only columns of interest
+patient_sample_data_filtered = patient_sample_data.filter(keep_cols)
+
+# Visualize NA values in filtered df
+#-----------------------------------------------
+
+# Create a bar plot
+plt.figure(figsize=(10, 6))
+sns.barplot(x=na_counts.index, y=na_counts.values)
+plt.xticks(rotation=90)
+plt.title("NA Entries in Dataset")
+plt.xlabel("Columns")
+plt.ylabel("Number of NA Entries")
+plt.tight_layout()  # To avoid labels being cut off in saved image
+plt.savefig("filtered_na_bar_plot.png")
+plt.close()  # Close the figure to free up memory
+
+# Create a heatmap for NA values
+plt.figure(figsize=(8, 6))
+sns.heatmap(df.isna(), cmap="viridis", cbar=False, yticklabels=False)
+plt.title("NA Values Heatmap")
+plt.tight_layout()  # To avoid labels being cut off in saved image
+plt.savefig("filtered_na_heatmap.png")
+plt.close()  # Close the figure to free up memory
+
+# WRITE column names txt file
+#--------------------------------
+
+# DEFINE column names string
+column_names_string = ""
+column_names = patient_sample_data_filtered.columns.tolist()
+for column_name in column_names:
+    column_names_string = column_names_string + column_name + '\n'
+
+# WRITE column names text file and one for column name harmonization
+write_txt_file(column_names_string, "filtered_column_names.txt")
+print("File written: filtered_column_names.txt")
 
 # DEFINE column names config string
 column_names_config_string = "# Please define the columns that represent the same information in this text file following the example rows below, excluding hashes\n"
 column_names_config_string = column_names_config_string + "# TMB = TMB, NONSYNONYMOUS_MUTATION_BURDEN, TMB_NONSYNONYMOUS, TOTAL_EXONIC_MUTATION_BURDEN\n"
 column_names_config_string = column_names_config_string + "# AGE = AGE, AGE_CURRENT, AGE_AT_SURGERY, AGE_YRS, AGE_AT_SEQ_REPORTED_YEARS"
+# WRITE column name harmonization txt file
+write_txt_file(column_names_config_string, "column_name_harmonization.txt")
+
+# PRINT instructions
+print('---------------------------------')
+print('A list of the remaining columns can be found in the "filtered_column_names.txt" file')
+print('Please guide the column name harmonization process by filling in the "column_name_harmonization.txt file"')
+print('See the "filtered_na_bar_plot.png" and the "filtered_na_heatmap.png" files in the current directory to view how many entries of each column is missing data')
+print("Please do this before proceeding to the next step.")
+print('---------------------------------')
+
+# APPLY changes
+#-------------------------------
+
+# WAIT for user to provide input
+wait_for_confirmation()
 
 
-# SEARCH for column names config file
-if search_file_in_current_directory(column_names_config_file) is False:
-    write_txt_file(column_names_config_string, column_names_config_file)
-    print("column_names_config.txt not found")
-    print("File written: column_names_config.txt")
+# HARMONIZE column names
+df_partitions_dict = {}
+grouped = patient_sample_data_filtered.groupby('study_name')
+
+# Iterate over each group and store dictionary
+for study_name, group in grouped:
+    df_partitions_dict[study_name] = group.copy()  # Using .copy() to ensure a new DataFrame for each partition
 
 
+# Parse column names harmonization txt file
+# Store entries in dict:
+parsed_dict = parse_column_name_harmonization("column_name_harmonization.txt")
 
-# WRITE column names config string
+# CHANGE column names
+change_column_names(df_partitions_dict, parsed_dict)
 
-
-# Check for column_names_config.txt
-
-# If not present
-#   write: colnames + extra info, instructions on how to set up...
-# If present
-#   Read
-
-
-
-# Output vis of NA data in patient-sample data
-
-# Check for existing colnames file
+# CONCATINATE to single df again
+patient_sample_df_colnames_harmonized = pd.concat(df_partitions_dict.values(), ignore_index=True)
 
 
 
 
+# STEP 3: Get input for categories harmonization
+#----------------------------------------------
 
-if config_file_status:
-    print(f"Found '{column_names_file_path}' at: {found_file_path}")
-else:
-    print(f"'{column_names_file_path}' not found in the current directory.")
+# WRITE categorical entries for each column to a text file:
+write_categorical_columns_to_file(patient_sample_df_colnames_harmonized, "categories_harmonization.txt")
+
+
 
 
 
