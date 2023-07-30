@@ -9,10 +9,11 @@ import os
 import re
 import pandas as pd
 import glob
-import subprocess
 import matplotlib.pyplot as plt
 import seaborn as sns
 import openpyxl
+
+
 
 
 os.getcwd()
@@ -23,11 +24,12 @@ os.chdir('/Users/davidlord/Documents/GitHub/NSCLC-ICI-Biomarkers/Data-Preparatio
 #===============================================================
 # DEFINE PARAMETERS
 #===============================================================
-# DEV: Move some of these to config file
+# Move some of these to config file?
 
 mutations_file_path = "mutations.txt"
 column_names_file = "column_names.txt"
 column_names_config_file = "column_names_config.txt"
+
 
 # Relative path to data folders directory
 data_path = './Data'
@@ -64,8 +66,8 @@ for mut in mutations_of_interest_list:
 # DEFINE FUNCTIONS
 #===============================================================
 
-# FOR BOTH INSTANCES
-#------------------------
+# RUNS FOR BOTH INSTANCES
+#-------------------------
 
 # Create a list of study data included in Data folder
 def get_data_dirs(directory):
@@ -136,8 +138,8 @@ def check_column_names_file():
     
 
     
-# FOR DATA ASSESSMENT MODULE
-#------------------------------
+# SPECIFIC FOR ASSESSMENT MODULE
+#---------------------------------
 
 # SEARCH for FILENAME
 def search_file_in_current_directory(filename):
@@ -162,18 +164,15 @@ def write_txt_file(text_body, output_file_path):
         print(f"Error occurred while writing to the text file: {e}")
     
     
-    
-    
 
-# FOR GENE MUTATIONS DATASET
-#--------------------------------
-
+# SPECIFIC FOR GENERATE DATASET MODULE
+#---------------------------------------
 
 
 
 
 #===============================================================
-# EXECUTE FUNCTIONS: BOTH INSTANCES
+# EXECUTE FUNCTIONS: DATA PREPARATION
 #===============================================================
 
 # GET PATH to directories included in data folder
@@ -285,16 +284,6 @@ else:
 #===============================================================
 
 
-column_names = patient_sample_data.columns
-# CHECK for 'column_names.txt' file
-# If file is NOT PRESENT: WRITE THE FILE and provide INFO
-if check_column_names_file() == False:
-    column_names = patient_sample_data.columns
-    print('bye')
-
-
-### DEV: Alter behaviour using ArgParse...
-
 
 
 ##### DEV #########
@@ -351,21 +340,6 @@ mutations_data = all_mutations_data[all_mutations_data['Hugo_Symbol'].isin(mutat
     
     duplicates_specific_cols = df.duplicated(subset=['column1', 'column2'])
     
-
-
-
-
-#####    DEV     #######
-
-# Create simplified dataframe of 10 rows
-temp_df = mutations_filtered.head(10)
-
-# FILTER to KEEP only relevant columns
-temp_df = temp_df[['Tumor_Sample_Barcode', 'Hugo_Symbol', 'Variant_Type', 'Consequence']]
-
-
-
-
 
 
 #####    DEV     #######
