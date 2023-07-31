@@ -87,7 +87,7 @@ class Preprocessor:
                 return "PD-L1_Expression"
             if x.endswith("BURDEN"):
                 return "TMB"
-            if x.endswith("DURABLE"):
+            if x.startswith("DURABLE"):
                 return "Treatment_Outcome"
             else:
                 return x
@@ -95,26 +95,26 @@ class Preprocessor:
             dfs = []
             cols_list = []
             lst = []
-            mylist = ['Patient_id','study_name','Sex','Histology','Age','TMB','PDL1','Smoking_history','smoking', 'smoker', 'nonsynonymous_mutation_burden', 'Tumor', 'durable_clinical_benefit','Treatment','PFS']
+            concat_dfs = []
+            mylist = ['Patient_id','study_name','Sex','Histology','Age','TMB','PDL1','Smoking_history','smoking', 'smoker', 'nonsynonymous_mutation_burden', 'durable_clinical_benefit','Treatment','PFS']
             mylist_lower = [i.lower() for i in mylist] 
             for df in df_dict.values():
                 dfs.append(df)
                 for i in dfs:
                     cols_list.append(i.columns.tolist())
                     cols_list_low = [[x.casefold() for x in sublst] for sublst in cols_list]
-            for k in mylist_lower:
-                has_match = False
-                for j in cols_list_low:
-                    lst.append([item for item in j if item.startswith(k.split()[0])])
-            flat_list = [num for sublist in lst for num in sublist]
-            flat_list_upper = [y.upper() for y in set(flat_list)]
-            for df in df_dict:
-                df_dict[df] = df_dict[df][df_dict[df].columns & flat_list_upper]
-                df_dict[df] = df_dict[df].rename(columns=renaming_fun)
-                df_dict[df] = df_dict[df].loc[:, ~df_dict[df].columns.duplicated(keep='first')]
-            for df in df_dict.values():
-                dfs.append(df)
-                concatinated_df = pd.concat(dfs, ignore_index = True)  
+                for k in mylist_lower:
+                    has_match = False
+                    for j in cols_list_low:
+                        lst.append([item for item in j if item.startswith(k.split()[0])])
+                flat_list = [num for sublist in lst for num in sublist]
+                flat_list_upper = [y.upper() for y in set(flat_list)]
+                for df in dfs:
+                    df = df[df.columns & flat_list_upper]
+                    df = df.rename(columns=renaming_fun)
+                    df = df.loc[:, ~df.columns.duplicated(keep='first')]
+                    concat_dfs.append(df) 
+            concatinated_df = pd.concat(concat_dfs, ignore_index = True)  
             return concatinated_df
             # Get path to directories included in data folder
         # Define dictionaries to store dataframes   
