@@ -41,9 +41,6 @@ mutation_file_name = 'data_mutations.txt'
 # DEFINE FUNCTIONS
 #===============================================================
 
-# RUNS FOR BOTH INSTANCES
-#-------------------------
-
 # Create a list of study data included in Data folder
 def get_data_dirs(directory):
     data_dirs = []
@@ -256,7 +253,7 @@ patient_sample_data = pd.merge(all_clinical_data, all_sample_data, on='PATIENT_I
 
 
 # GET USER INPUT TO DEFINE DATA PROCESSING
-#====================================================================
+#===============================================
 ### DEV ###
 
 # STEP 1: Get input for relevant columns
@@ -373,12 +370,11 @@ print('See the "filtered_na_bar_plot.png" and the "filtered_na_heatmap.png" file
 print("Please do this before proceeding to the next step.")
 print('---------------------------------')
 
-# APPLY changes
-#-------------------------------
-
 # WAIT for user to provide input
 wait_for_confirmation()
 
+# APPLY changes
+#-------------------------------
 
 # HARMONIZE column names
 df_partitions_dict = {}
@@ -400,14 +396,26 @@ change_column_names(df_partitions_dict, parsed_dict)
 patient_sample_df_colnames_harmonized = pd.concat(df_partitions_dict.values(), ignore_index=True)
 
 
-
-
 # STEP 3: Get input for categories harmonization
 #----------------------------------------------
 
 # WRITE categorical entries for each column to a text file:
 write_categorical_columns_to_file(patient_sample_df_colnames_harmonized, "categories_harmonization.txt")
 
+
+# DEFINE column names config string
+categories_harmonization_string = "# Please define the categories that represent the same information in this text file following the example rows below, excluding hashes\n"
+categories_harmonization_string = categories_harmonization_string + '# "SMOKING_STATUS": "SMOKER"="YES", "NO"="NON-SMOKER"="N"\n'
+categories_harmonization_string = categories_harmonization_string + '# "SEX": "MALE"="M"="male", "FEMALE"="F"="female"'
+
+# WRITE column name harmonization txt file
+write_txt_file(categories_harmonization_string, "column_name_harmonization.txt")
+
+# WAIT for user to provide input
+wait_for_confirmation()
+
+# APPLY changes
+#-------------------------------
 
 
 
@@ -421,9 +429,6 @@ write_categorical_columns_to_file(patient_sample_df_colnames_harmonized, "catego
 #===============================================================
 
 
-
-
-##### DEV #########
 
 # Keep only relevant columns in all_mutations data
 
@@ -477,70 +482,5 @@ mutations_data = all_mutations_data[all_mutations_data['Hugo_Symbol'].isin(mutat
     
     duplicates_specific_cols = df.duplicated(subset=['column1', 'column2'])
     
-
-
-#####    DEV     #######
-
-# AIM
-#--------
-
-# Now time for some data engineering :)
-
-# We want a dataset in which each row represents a patient and mutations of interests are columns. 
-# However, mutations are currently manifested as rows in the mutations df. 
-
-# The sample dataset is needed to link information together between the clinical df 
-# and mutational df, see data relations information below for details. 
-
-# IDEA: 
-    
-    # Define a list of genes of interest, place in other file.
-    
-    # Go through mutations df, keep only rows in which Hugo_Symbol matches a gene in list
-        # Store in temp_df
-    
-    # Join patient and sample tables to joined_df
-    
-    # Add mutation names in mutations_of_interest_list as columns to joined_df
-    
-    # For each row in joined_df
-        # if joined_df[tumor_sample_barcode] = temp_df[tumor_sample_barcode]
-            # tempvar = temp_df[Hugo_Symbol]
-            # joined_df[tempvar] = TRUE
-    
-
-
-
-# DATA RELATIONS BETWEEN TABLES:
-#-----------------------------------------
-# JOIN DATAFRAMES to single dataset
-# CLINICAL DATA: PK = "PATIENT_ID"
-# SAMPLE DATA: PK = "SAMPLE_ID", FK on Clinical = "PATIENT_ID"
-# MUTATIONS DATA: FK on Sample = "Tumor_Sample_Barcode"
-
-
-# COLUMNS OF INTEREST: 
-#-----------------------
-# CLINICAL DATA: 
-# SAMPLE DATA: 
-#MUTATIONS DATA: "Hugo_Symbol", "Consequence", "Variant_Type", and "Tumor_Sample_Barcode"
-
-
-
-# WRITE FILES: Concatinated dataframes
-
-
-
-#===============================================================
-# DEBUG
-#===============================================================
-
-
-
-
-
-
-
-
 
 
