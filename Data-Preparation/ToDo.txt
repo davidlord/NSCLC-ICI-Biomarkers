@@ -1,0 +1,34 @@
+ToDo
+--------------------------
+
+Aim: Simplify data preparation module. 
+Decrease the scope, make the module specific to the data at hand. 
+
+
+
+Still keep column name harmonizations categorical data harmonization logic in separate txt files.
+
+Script idea: 
+
+In both instances:
+- Read data in cBioPortal files.
+- Join relevant tables into dataset.
+
+1. --harmonization
+- Read gene mutations of interest file.
+- Produce outputs
+
+- Output summary table in form of:
+STUDY 1 | column 1 | (if num: range, if string: unique entries in list)
+STUDY 1 | column 2 | (if num: range, if string: unique entries in list)
+...
+STUDY 2 | column 1 | (if num: range, if string: unique entries in list)
+...
+
+
+2. --dataset
+- Parse harmonization txt files. 
+- Process data based on input from step above
+- Output dataset
+
+
