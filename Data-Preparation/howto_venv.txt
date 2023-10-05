@@ -1,0 +1,14 @@
+To create virtual environment:
+python3 -m venv venv_name
+
+Should then be able to see virtual env using ls
+
+To activate virtual environment:
+source venv_name/bin/activate
+
+To deactivate virtual env:
+deactivate
+
+
+
+
