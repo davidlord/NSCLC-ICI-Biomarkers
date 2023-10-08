@@ -17,9 +17,8 @@ os.getcwd()
 os.chdir('/Users/davidlord/Documents/GitHub/NSCLC-ICI-Biomarkers/Data-Preparation')
 
 
-#===============================================================
 # DEFINE PARAMETERS
-#===============================================================
+#---------------------------------------------------------------
 # Move some of these to config file?
 
 mutations_file_path = "mutations.txt"
@@ -38,6 +37,17 @@ mutation_file_name = 'data_mutations.txt'
 #===============================================================
 # DEFINE FUNCTIONS
 #===============================================================
+
+# DATA HANDLING & PROCESSING
+#---------------------------------------------------------------
+
+# READ lines from text file
+def read_lines_from_file(filename):
+    lines = []
+    with open(filename, 'r') as file:
+        for line in file:
+            lines.append(line.strip())
+    return lines
 
 # Create a list of study data included in Data folder
 def get_data_dirs(directory):
@@ -66,7 +76,6 @@ def remove_commented_lines(path_list, name):
         
         with open(file_path, 'w') as file:
             file.writelines(keep_lines)
-        print("Successfully removed commented lines from: " + file_path)
 
 
 # Read file that matches name in path into dictionary of dataframes
@@ -98,6 +107,9 @@ def concatinate_dfs(df_dict):
     return concatinated_df
 
 
+# DATA HARMONIZATION FUNCTIONS
+#---------------------------------------------------------------
+
 # Check if column_names.txt file exists or not
 def check_column_names_file():
     file_name = 'column_names.txt'
@@ -106,13 +118,6 @@ def check_column_names_file():
     else:
         return False
 
-# READ lines from text file
-def read_lines_from_file(filename):
-    lines = []
-    with open(filename, 'r') as file:
-        for line in file:
-            lines.append(line.strip())
-    return lines
 
 
 # SEARCH for FILENAME
@@ -194,15 +199,15 @@ def write_categorical_columns_to_file(df, output_file):
 # EXECUTE FUNCTIONS
 #===============================================================
 
-
-# DATA PREPARATION
-#====================================================================
+# DATA HANDLING & PREPROCESSING
+#---------------------------------------------------------------
 
 # REAT MUTATIONS of interest text file
 mutations_of_interest_list = read_lines_from_file("mutations.txt")
-print("Mutations of interest specified in file: ")
+print("Mutations of interest as specified in file: ")
 for mut in mutations_of_interest_list:
     print(mut)
+
 
 # GET PATH to directories included in data folder
 data_included = get_data_dirs(data_path)
@@ -222,6 +227,7 @@ clinical_dfs = {}
 sample_dfs = {}
 mutation_dfs = {}
 
+
 # READ DATA tables into dictionary of dataframes
     # Clinical data: 
 read_data(data_included, clinical_file_name, clinical_dfs)
@@ -229,6 +235,7 @@ read_data(data_included, clinical_file_name, clinical_dfs)
 read_data(data_included, sample_file_name, sample_dfs)
     # Mutations data: 
 read_data(data_included, mutation_file_name, mutation_dfs)
+
 
 # ADD STUDY NAME as column to dataframes in dictionaries
     # Clinical data: 
@@ -238,6 +245,7 @@ add_dataframe_name_column(sample_dfs)
     # Mutations data:
 add_dataframe_name_column(mutation_dfs)
 
+
 # CONCATINATE DATAFRAMES in dicts into single dataframe
     # Clinical data:
 all_clinical_data = concatinate_dfs(clinical_dfs)
@@ -246,8 +254,111 @@ all_sample_data = concatinate_dfs(sample_dfs)
     # Mutational data:
 all_mutations_data = concatinate_dfs(mutation_dfs)
 
+
 # JOIN clinical- and sample dataframes to single
 patient_sample_data = pd.merge(all_clinical_data, all_sample_data, on='PATIENT_ID', how='left')
+
+
+
+
+#### STUCK HERE #####
+
+
+
+# Add column for each mutation in mutations list. 
+for mutation in mutations_of_interest_list:
+    patient_sample_data[mutation] = 'WT'
+    
+
+# Create a mask for the rows of interest in all_mutations_data
+mask = all_mutations_data['Hugo_Symbol'].isin(mutations_of_interest_list)
+
+# Filter rows in all_mutations_data and extract relevant columns
+filtered_mutations_data = all_mutations_data.loc[mask, ['Tumor_Sample_Barcode', 'Hugo_Symbol', 'Consequence']]    
+
+for index_ps, row_ps in patient_sample_data.iterrows():
+    for index_mut, row_mut in all_mutations_data.iterrows():
+        if ow_ps['SAMPLE_ID'] == row_mut['Tumor_Sample_Barcode']:
+            
+
+
+    
+
+# FIRST FILTER dataset
+
+for index_mut, row_mut in all_mutations_data.iterrows():
+    mut_sampleid = row_mut['Tumor_Sample_Barcode']
+    hugo_symbol = row_mut['Hugo_Symbol']
+    consequence = row_mut['Consequence']
+    
+    for index_ps, row_ps in patient_sample_data.iterrows():
+        if hugo_symbol in mutations_of_interest_list:
+            if row_ps['SAMPLE_ID'] == mut_sampleid:
+                row_ps[hugo_symbol] = consequence
+            
+
+# From ChatGPT: 
+
+
+# Merge the filtered data into patient_sample_data based on SAMPLE_ID and Hugo_Symbol
+merged_data = patient_sample_data.merge(filtered_mutations_data, how='left', left_on='SAMPLE_ID', right_on='Tumor_Sample_Barcode')
+
+# Update the columns in patient_sample_data with non-null values from Consequence
+for gene in mutations_of_interest_list:
+    mask = merged_data['Hugo_Symbol'] == gene
+    patient_sample_data[gene].update(merged_data.loc[mask, 'Consequence'])
+
+
+
+            
+            print("ok")
+            
+            
+            
+            
+            if row_ps['SAMPLE_ID'] == mut_sampleid:
+                print("ok")
+                #patient_sample_data[hugo_symbol] = consequence
+
+
+
+# Create nested dict holding mutations data
+
+
+    
+    
+for index, row in all_mutations_data.iterrows():
+    mutdf_sampleid = row.Tumor_Sample_Barcode
+    
+    
+
+
+    
+for index, row in patient_sample_data.iterrows():
+    if row.SAMPLE_ID == all_mutations_data['Tumor_Sample_Barcode']:
+        print(f"Sample from mut df: {all_mutations_data['Tumor_Sample_Barcode']}")
+
+
+
+# Add mutations of interest data 
+for index, row in patient_sample_data.iterrows():
+    temp_sample_id = row['SAMPLE_ID']
+    
+    matching_row = all_mutations_data[]
+    print()
+    
+    
+    
+    if row['SAMPLE_ID'] == all_mutations_data['Tumor_Sample_Barcode']:
+        tempvar = all_mutations_data['Hugo_Symbol']
+        patient_sample_data[tempvar] = all_mutations_data['Consequence']
+
+
+
+print(patient_sample_data['SAMPLE_ID'])
+print(all_mutations_data['Tumor_Sample_Barcode'])
+
+
 
 
 # GET USER INPUT TO DEFINE DATA PROCESSING
