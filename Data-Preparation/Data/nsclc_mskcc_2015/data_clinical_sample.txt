@@ -1,7 +1,3 @@
-#Patient Identifier	Sample Identifier	Sample Class	Sample Collection Source	Tissue Source Site	Sample Type	Mean Target Coverage Tumor	Mean Target Coverage Normal	Oncotree Code	Cancer Type	Cancer Type Detailed	Somatic Status	TMB (nonsynonymous)
-#Identifier to uniquely specify a patient.	A unique sample identifier.	The sample classification (i.e., tumor, cellline, xenograph).	Sample Collection Source	A Tissue Source Site collects samples (tissue, cell, or blood) and clincal metadata which are then sent to tha Biospecimen Core Resource.	The type of sample (i.e., normal, primary, met, recurrence).	Mean Target Coverage Tumor	Mean Target Coverage Normal	Oncotree Code	Cancer Type	Cancer Type Detailed	Somatic Status	TMB (nonsynonymous)
-#STRING	STRING	STRING	STRING	STRING	STRING	NUMBER	NUMBER	STRING	STRING	STRING	STRING	NUMBER
-#1	1	1	1	1	1	1	1	1	1	1	1	1
 PATIENT_ID	SAMPLE_ID	SAMPLE_CLASS	SAMPLE_COLLECTION_SOURCE	TISSUE_SOURCE_SITE	SAMPLE_TYPE	MEAN_TARGET_COVERAGE_TUMOR	MEAN_TARGET_COVERAGE_NORMAL	ONCOTREE_CODE	CANCER_TYPE	CANCER_TYPE_DETAILED	SOMATIC_STATUS	TMB_NONSYNONYMOUS
 AU5884	AU5884	Tumor	Frozen	Lung	Primary	128.058385	70.843604	LUAD	Lung cancer	Lung Adenocarcinoma	Matched	1.13333333333
 BL3403	BL3403	Tumor	FFPE	Pleura	Met	178.814652	142.309651	LUAD	Lung cancer	Lung Adenocarcinoma	Matched	4.7
