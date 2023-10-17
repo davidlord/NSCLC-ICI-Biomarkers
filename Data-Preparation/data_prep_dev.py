@@ -107,18 +107,9 @@ def concatinate_dfs(df_dict):
     return concatinated_df
 
 
+
 # DATA HARMONIZATION FUNCTIONS
 #---------------------------------------------------------------
-
-# Check if column_names.txt file exists or not
-def check_column_names_file():
-    file_name = 'column_names.txt'
-    if os.path.isfile(file_name):
-        return True
-    else:
-        return False
-
-
 
 # SEARCH for FILENAME
 def search_file_in_current_directory(filename):
@@ -133,7 +124,8 @@ def search_file_in_current_directory(filename):
 
     return file_status
     
-    
+
+### TO BE REMOVED ###
 # WRITE text file 
 def write_txt_file(text_body, output_file_path):
     try:
@@ -141,18 +133,7 @@ def write_txt_file(text_body, output_file_path):
             text_file.write(text_body)
     except Exception as e:
         print(f"Error occurred while writing to the text file: {e}")
-
-# WAIT for confirmation
-def wait_for_confirmation():
-    while True:
-        user_input = input("Please enter 'y' or 'Y' to continue: ")
-        if user_input.lower() == 'y':
-            break
-        else:
-            print("Invalid input. Please try again.")
-
-    print("User confirmed. Proceeding with further code execution...")
-    # Put your code here that you want to execute after the user confirms with 'y' or 'Y'
+### TO BE REMOVED ###
 
 
 # PARSE column_name_harmonization.txt
@@ -162,11 +143,17 @@ def parse_column_name_harmonization(file_path):
         for line in file:
             line = line.strip()
             if not line.startswith('#'):
-                key, values = line.split('=', 1)
-                key = key.strip()
-                values = [value.strip() for value in values.split(',')]
-                parsed_dict[key] = values
+                parts = line.split('=')
+                if len(parts) == 2:
+                    key, values = parts
+                    key = key.strip()
+                    values = [value.strip() for value in values.split(',')]
+                    parsed_dict[key] = values
+                else:
+                    print(f"Ignoring line: {line} - Does not match expected format")
+
     return parsed_dict
+
 
 # CHANGE column names based on dictionary of lists
 def change_column_names(df_partitions_dict, parsed_dict):
@@ -263,7 +250,7 @@ patient_sample_data = pd.merge(all_clinical_data, all_sample_data, on='PATIENT_I
 
 #### STUCK HERE #####
 
-
+# ADD MUTATION columns
 
 # Add column for each mutation in mutations list. 
 for mutation in mutations_of_interest_list:
@@ -281,8 +268,6 @@ for index_ps, row_ps in patient_sample_data.iterrows():
         if ow_ps['SAMPLE_ID'] == row_mut['Tumor_Sample_Barcode']:
             
 
-
-    
 
 # FIRST FILTER dataset
 
@@ -309,119 +294,24 @@ for gene in mutations_of_interest_list:
     patient_sample_data[gene].update(merged_data.loc[mask, 'Consequence'])
 
 
-
+#### STUCK HERE #####^
             
-            print("ok")
-            
-            
-            
-            
-            if row_ps['SAMPLE_ID'] == mut_sampleid:
-                print("ok")
-                #patient_sample_data[hugo_symbol] = consequence
 
 
 
-# Create nested dict holding mutations data
+# DATA HARMONIZATION
+#---------------------------------------------------------------
 
+###  DATA INVESTIGATION  ###
+###  DATA INVESTIGATION  ###
+# Columns of interest
+print(patient_sample_data['PED_IND'])
 
-    
-    
-for index, row in all_mutations_data.iterrows():
-    mutdf_sampleid = row.Tumor_Sample_Barcode
-    
-    
+null_count = patient_sample_data['PED_IND'].isnull().sum()
+print(null_count)
+###  DATA INVESTIGATION  ###
+###  DATA INVESTIGATION  ###
 
-
-    
-for index, row in patient_sample_data.iterrows():
-    if row.SAMPLE_ID == all_mutations_data['Tumor_Sample_Barcode']:
-        print(f"Sample from mut df: {all_mutations_data['Tumor_Sample_Barcode']}")
-
-
-
-# Add mutations of interest data 
-for index, row in patient_sample_data.iterrows():
-    temp_sample_id = row['SAMPLE_ID']
-    
-    matching_row = all_mutations_data[]
-    print()
-    
-    
-    
-    if row['SAMPLE_ID'] == all_mutations_data['Tumor_Sample_Barcode']:
-        tempvar = all_mutations_data['Hugo_Symbol']
-        patient_sample_data[tempvar] = all_mutations_data['Consequence']
-
-
-
-print(patient_sample_data['SAMPLE_ID'])
-print(all_mutations_data['Tumor_Sample_Barcode'])
-
-
-
-
-# GET USER INPUT TO DEFINE DATA PROCESSING
-#===============================================
-### DEV ###
-
-# STEP 1: Get input for relevant columns
-#-----------------------------------------------
-
-# Visualize NA values in joined df
-#-----------------------------------------------
-
-# Count NA entries
-na_counts = patient_sample_data.isna().sum()
-
-# Create a bar plot
-plt.figure(figsize=(10, 6))
-sns.barplot(x=na_counts.index, y=na_counts.values)
-plt.xticks(rotation=90)
-plt.title("NA Entries in Dataset")
-plt.xlabel("Columns")
-plt.ylabel("Number of NA Entries")
-plt.tight_layout()  # To avoid labels being cut off in saved image
-plt.savefig("na_bar_plot.png")
-plt.close()  # Close the figure to free up memory
-
-# Create a heatmap for NA values
-plt.figure(figsize=(8, 6))
-sns.heatmap(df.isna(), cmap="viridis", cbar=False, yticklabels=False)
-plt.title("NA Values Heatmap")
-plt.tight_layout()  # To avoid labels being cut off in saved image
-plt.savefig("na_heatmap.png")
-plt.close()  # Close the figure to free up memory
-
-# WRITE COLUMN names text files
-# DEFINE column names string
-column_names_string = ""
-column_names = patient_sample_data.columns.tolist()
-for column_name in column_names:
-    column_names_string = column_names_string + column_name + '\n'
-
-
-# WRITE column names text file and one for columns of interest
-write_txt_file(column_names_string, "column_names.txt")
-print("File written: column_names.txt")
-
-write_txt_file(column_names_string, "columns_of_interest.txt")
-
-# PRINT instructions
-print('---------------------------------')
-print("File written: columns_of_interest.txt")
-print('Please open the "columns_of_interest.txt" file, remove remove columns that are not of interest, and save file')
-print('See the "na_bar_plot.png" and the "na_heatmap.png" files in the current directory to view how many entries of each column is missing data')
-print("Please do this before proceeding to the next step.")
-print('---------------------------------')
-
-
-# WAIT for user to provide input
-wait_for_confirmation()
-
-
-# STEP 2: Get input for column harmonization
-#----------------------------------------------
 
 # READ columns of interest txt file
 keep_cols = read_lines_from_file("columns_of_interest.txt")
@@ -429,65 +319,61 @@ keep_cols = read_lines_from_file("columns_of_interest.txt")
 # FILTER: Keep only columns of interest
 patient_sample_data_filtered = patient_sample_data.filter(keep_cols)
 
-# Visualize NA values in filtered df
-#-----------------------------------------------
 
-# Create a bar plot
-plt.figure(figsize=(10, 6))
-sns.barplot(x=na_counts.index, y=na_counts.values)
-plt.xticks(rotation=90)
-plt.title("NA Entries in Dataset")
-plt.xlabel("Columns")
-plt.ylabel("Number of NA Entries")
-plt.tight_layout()  # To avoid labels being cut off in saved image
-plt.savefig("filtered_na_bar_plot.png")
-plt.close()  # Close the figure to free up memory
 
-# Create a heatmap for NA values
-plt.figure(figsize=(8, 6))
-sns.heatmap(df.isna(), cmap="viridis", cbar=False, yticklabels=False)
-plt.title("NA Values Heatmap")
-plt.tight_layout()  # To avoid labels being cut off in saved image
-plt.savefig("filtered_na_heatmap.png")
-plt.close()  # Close the figure to free up memory
+###  DEV HERE  ###
+###  DEV HERE  ###
+###  DEV HERE  ###
+###  DEV HERE  ###
 
-# WRITE column names txt file
+
+# HARMONIZE Column names
+
+column_name_synonyms = {}
+column_name_synonyms = parse_column_name_harmonization("column_names_config.txt")
+
+
+
+for new_column_name, synonyms in column_name_synonyms.items():
+    for synonym in synonyms:
+        if synonym in patient_sample_data_filtered.columns:
+            patient_sample_data_filtered.rename(columns={synonym: new_column_name}, inplace=True)
+
+
+# Group by column name and sum the values
+merged_df = patient_sample_data_filtered.groupby(patient_sample_data_filtered.columns, axis=1).sum()
+
+# Reset the column names to avoid duplicates
+merged_df.columns = [col[0] for col in merged_df.columns]
+
+print(merged_df)
+
+
+    
+###  DEV HERE  ###
+###  DEV HERE  ###
+###  DEV HERE  ###
+###  DEV HERE  ###
+
+
+
+
+#### OLD CODE BELOW #####
+#### OLD CODE BELOW #####
+#### OLD CODE BELOW #####
+#### OLD CODE BELOW #####
+
+
+
+
 #--------------------------------
-
-# DEFINE column names string
-column_names_string = ""
-column_names = patient_sample_data_filtered.columns.tolist()
-for column_name in column_names:
-    column_names_string = column_names_string + column_name + '\n'
-
-# WRITE column names text file and one for column name harmonization
-write_txt_file(column_names_string, "filtered_column_names.txt")
-print("File written: filtered_column_names.txt")
-
-# DEFINE column names config string
-column_names_config_string = "# Please define the columns that represent the same information in this text file following the example rows below, excluding hashes\n"
-column_names_config_string = column_names_config_string + "# TMB = TMB, NONSYNONYMOUS_MUTATION_BURDEN, TMB_NONSYNONYMOUS, TOTAL_EXONIC_MUTATION_BURDEN\n"
-column_names_config_string = column_names_config_string + "# AGE = AGE, AGE_CURRENT, AGE_AT_SURGERY, AGE_YRS, AGE_AT_SEQ_REPORTED_YEARS"
-# WRITE column name harmonization txt file
-write_txt_file(column_names_config_string, "column_name_harmonization.txt")
-
-# PRINT instructions
-print('---------------------------------')
-print('A list of the remaining columns can be found in the "filtered_column_names.txt" file')
-print('Please guide the column name harmonization process by filling in the "column_name_harmonization.txt file"')
-print('See the "filtered_na_bar_plot.png" and the "filtered_na_heatmap.png" files in the current directory to view how many entries of each column is missing data')
-print("Please do this before proceeding to the next step.")
-print('---------------------------------')
-
-# WAIT for user to provide input
-wait_for_confirmation()
 
 # APPLY changes
 #-------------------------------
 
 # HARMONIZE column names
 df_partitions_dict = {}
-grouped = patient_sample_data_filtered.groupby('study_name')
+grouped = patient_sample_data_filtered.groupby('study_name_x')
 
 # Iterate over each group and store dictionary
 for study_name, group in grouped:
