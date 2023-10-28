@@ -10,7 +10,7 @@ import re
 import pandas as pd
 import glob
 import matplotlib.pyplot as plt
-import seaborn as sns
+
 
 
 os.getcwd()
@@ -29,7 +29,7 @@ column_names_config_file = "column_names_config.txt"
 data_path = './Data'
 
 # File names from cBioPortal: 
-clinical_file_name = 'data_clinical_patient.txt'
+patient_file_name = 'data_clinical_patient.txt'
 sample_file_name = 'data_clinical_sample.txt'
 mutation_file_name = 'data_mutations.txt'
 
@@ -210,14 +210,14 @@ remove_commented_lines(data_included, mutation_file_name)
 
 
 # DEFINE DICTIONARIES to store dataframes
-clinical_dfs = {}
+patient_dfs = {}
 sample_dfs = {}
 mutation_dfs = {}
 
 
 # READ DATA tables into dictionary of dataframes
     # Clinical data: 
-read_data(data_included, clinical_file_name, clinical_dfs)
+read_data(data_included, patient_file_name, patient_dfs)
     # Sample data:
 read_data(data_included, sample_file_name, sample_dfs)
     # Mutations data: 
@@ -226,7 +226,7 @@ read_data(data_included, mutation_file_name, mutation_dfs)
 
 # ADD STUDY NAME as column to dataframes in dictionaries
     # Clinical data: 
-add_dataframe_name_column(clinical_dfs)
+add_dataframe_name_column(patient_dfs)
     # Sample data: 
 add_dataframe_name_column(sample_dfs)
     # Mutations data:
@@ -234,8 +234,8 @@ add_dataframe_name_column(mutation_dfs)
 
 
 # CONCATINATE DATAFRAMES in dicts into single dataframe
-    # Clinical data:
-all_clinical_data = concatinate_dfs(clinical_dfs)
+    # Patient data:
+all_patient_data = concatinate_dfs(patient_dfs)
     # Sample data: 
 all_sample_data = concatinate_dfs(sample_dfs)
     # Mutational data:
@@ -243,9 +243,54 @@ all_mutations_data = concatinate_dfs(mutation_dfs)
 
 
 # JOIN clinical- and sample dataframes to single
-patient_sample_data = pd.merge(all_clinical_data, all_sample_data, on='PATIENT_ID', how='left')
+patient_sample_data = pd.merge(all_patient_data, all_sample_data, on='PATIENT_ID', how='left')
 
 
+# READ columns of interest txt file
+keep_cols = read_lines_from_file("columns_of_interest.txt")
+
+# FILTER: Keep only columns of interest
+patient_sample_data_filtered = patient_sample_data.filter(keep_cols)
+
+
+# HARMONIZE Column names
+column_name_synonyms = {}
+column_name_synonyms = parse_column_name_harmonization("column_names_config.txt")
+
+
+for new_column_name, synonyms in column_name_synonyms.items():
+    for synonym in synonyms:
+        if synonym in patient_sample_data_filtered.columns:
+            patient_sample_data_filtered.rename(columns={synonym: new_column_name}, inplace=True)
+
+
+# Group by column name and sum the values
+merged_df = patient_sample_data_filtered.groupby(patient_sample_data_filtered.columns, axis=1).sum()
+
+
+print(merged_df)
+
+### TEMP ###
+# Get column names
+colnames = merged_df.columns.tolist()
+### TEMP ###
+
+### TEMP COLUMN INVESTIGATION
+
+
+# Is NONSYNONYMOUS_MUTATION_BURDEN the same as TMB? --> No
+
+tmp_df = merged_df[['NONSYNONYMOUS_MUTATION_BURDEN', 'TMB']]
+
+merged_df['SAMPLE_CLASS'].describe()
+merged_df['TMB'].describe()
+merged_df['TMB'].describe()
+
+# OS_MONTHS the same as OS_MONTHS_DMT? --> 
+tmp_df = merged_df[['TISSUE_SOURCE_SITE', 'PRIMARY_SITE']]
+
+
+### TEMP ###
 
 
 #### STUCK HERE #####
@@ -313,12 +358,6 @@ print(null_count)
 ###  DATA INVESTIGATION  ###
 
 
-# READ columns of interest txt file
-keep_cols = read_lines_from_file("columns_of_interest.txt")
-
-# FILTER: Keep only columns of interest
-patient_sample_data_filtered = patient_sample_data.filter(keep_cols)
-
 
 
 ###  DEV HERE  ###
@@ -327,26 +366,6 @@ patient_sample_data_filtered = patient_sample_data.filter(keep_cols)
 ###  DEV HERE  ###
 
 
-# HARMONIZE Column names
-
-column_name_synonyms = {}
-column_name_synonyms = parse_column_name_harmonization("column_names_config.txt")
-
-
-
-for new_column_name, synonyms in column_name_synonyms.items():
-    for synonym in synonyms:
-        if synonym in patient_sample_data_filtered.columns:
-            patient_sample_data_filtered.rename(columns={synonym: new_column_name}, inplace=True)
-
-
-# Group by column name and sum the values
-merged_df = patient_sample_data_filtered.groupby(patient_sample_data_filtered.columns, axis=1).sum()
-
-# Reset the column names to avoid duplicates
-merged_df.columns = [col[0] for col in merged_df.columns]
-
-print(merged_df)
 
 
     
@@ -370,25 +389,6 @@ print(merged_df)
 
 # APPLY changes
 #-------------------------------
-
-# HARMONIZE column names
-df_partitions_dict = {}
-grouped = patient_sample_data_filtered.groupby('study_name_x')
-
-# Iterate over each group and store dictionary
-for study_name, group in grouped:
-    df_partitions_dict[study_name] = group.copy()  # Using .copy() to ensure a new DataFrame for each partition
-
-
-# Parse column names harmonization txt file
-# Store entries in dict:
-parsed_dict = parse_column_name_harmonization("column_name_harmonization.txt")
-
-# CHANGE column names
-change_column_names(df_partitions_dict, parsed_dict)
-
-# CONCATINATE to single df again
-patient_sample_df_colnames_harmonized = pd.concat(df_partitions_dict.values(), ignore_index=True)
 
 
 # STEP 3: Get input for categories harmonization
