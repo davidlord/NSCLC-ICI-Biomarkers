@@ -1,0 +1,25 @@
+# You can use this file to create a conda environment for this pipeline:
+#   conda env create -f environment.yml
+name: nsclc-ici-biomarkers
+channels:
+  - defaults
+dependencies:
+  - matplotlib==3.5.2
+  - numpy==1.22.4
+  - pandas==1.4.2
+  - pip
+  - pip:
+    - cycler==0.11.0
+    - eli5==0.13.0
+    - gitpython==3.1.27
+    - python-dateutil==2.8.2
+    - tensorflow==2.9.1
+    - tensorflow-probability>=0.8.0
+    - xgboost==1.6.1
+  - python=3.7
+  - scikit-learn==1.1.1
+  - scipy==1.8.1
+  - seaborn==0.11.2
+  - re==2.2.1
+  - oyaml==1.0
+  - tqdm==4.46.0
