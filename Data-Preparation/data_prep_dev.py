@@ -8,6 +8,9 @@ import pandas as pd
 import glob
 import matplotlib.pyplot as plt
 
+### TEMP path
+C:\Users\kxvz994\Documents\NSCLC-ICI-Biomarkers\Data-Preparation
+
 
 #===============================================================
 # DEFINE PARAMETERS
