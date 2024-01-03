@@ -1,0 +1,47 @@
+PATIENT_ID	SAMPLE_ID	ONCOTREE_CODE	CANCER_TYPE	CANCER_TYPE_DETAILED	NOTE	SOMATIC_STATUS	TMB_NONSYNONYMOUS	study_name	PN_STATUS	PATHOLOGIC_STAGE	SUBTYPE_GROUP	PREDOMINANT_HISTOLOGIC_SUBTYPE	FGA_FACETS	TMB	DATE_ADDED	MONTH_ADDED	WEEK_ADDED	CRDB_SURVEY_COMMENTS	SAMPLE_TYPE	SAMPLE_CLASS	METASTATIC_SITE	PRIMARY_SITE	GENE_PANEL	SO_COMMENTS	SAMPLE_COVERAGE	TUMOR_PURITY	MSI_COMMENT	MSI_SCORE	MSI_TYPE	INSTITUTE	AGE_AT_SEQ_REPORTED_YEARS	ARCHER	PATH_SLIDE_EXISTS	MSK_SLIDE_ID	WHO_GRADE	MGMT_STATUS	SAMPLE_COLLECTION_SOURCE	TISSUE_SOURCE_SITE	MEAN_TARGET_COVERAGE_TUMOR	MEAN_TARGET_COVERAGE_NORMAL	HLA_A1_ALLELE	HLA_A2_ALLELES	HLA_B1_ALLELES	HLA_B2_ALLELES	HLA_C1_ALLELES	HLA_C2_ALLELES	MUTATION_RATE	FGA	PDL1_SCORE
+luad_mskcc_2015_2	HE3202	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	24.1333333333	luad_mskcc_2015																																									
+luad_mskcc_2015_3	TU0428	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	20.3	luad_mskcc_2015																																									
+luad_mskcc_2015_6	RI1933	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	15.6	luad_mskcc_2015																																									
+luad_mskcc_2015_9	CA9903	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	10.5666666667	luad_mskcc_2015																																									
+luad_mskcc_2015_12	KA3947	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	9.86666666667	luad_mskcc_2015																																									
+luad_mskcc_2015_10	SC0899	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	9.73333333333	luad_mskcc_2015																																									
+luad_mskcc_2015_13	MA7027	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	9.46666666667	luad_mskcc_2015																																									
+luad_mskcc_2015_18	DI6359	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	7.56666666667	luad_mskcc_2015																																									
+luad_mskcc_2015_16	JB112852	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	6.13333333333	luad_mskcc_2015																																									
+luad_mskcc_2015_21	SC6470	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	6.03333333333	luad_mskcc_2015																																									
+luad_mskcc_2015_23	GR4788	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	5.5	luad_mskcc_2015																																									
+luad_mskcc_2015_22	BL3403	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	4.73333333333	luad_mskcc_2015																																									
+luad_mskcc_2015_27	RO3338	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	3.46666666667	luad_mskcc_2015																																									
+luad_mskcc_2015_33	AU5884	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	1.13333333333	luad_mskcc_2015																																									
+luad_mskcc_2015_31	VA1330	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	1.36666666667	luad_mskcc_2015																																									
+luad_mskcc_2015_34	VA7859	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma	Self reported self status	Matched	0.3	luad_mskcc_2015																																									
+P-0002768	P-0002768-T02-IM6	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma			5.1881885699	luad_mskcc_2020	Negative	1.0	Acinar/ Papillary	Papillary	0.115892837	5.3																																			
+P-0005975	P-0005975-T01-IM5	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma			10.7659166738	luad_mskcc_2020	Positive	3.0	Acinar/ Papillary	Acinar	0.218246544	10.8																																			
+P-0006343	P-0006343-T01-IM5	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma			5.87231818569	luad_mskcc_2020	Negative	1.0	Micropapillary/ Solid	Solid	0.115105585	5.9																																			
+P-0007121	P-0007121-T01-IM5	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma			7.82975758092	luad_mskcc_2020	Positive	3.0	Micropapillary/ Solid	Solid	0.0	7.9																																			
+P-0008176	P-0008176-T01-IM5	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma			3.91487879046	luad_mskcc_2020	Negative	3.0	Micropapillary/ Solid	Micropapillary	0.30417194	3.9																																			
+P-0000913	P-0000913-T02-IM5	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma		Matched	3.91487879046	luad_mskimpact_2021							6/30/15	2015/06	2015, Wk. 27		Metastasis	Tumor	Lymph Node	Lung	IMPACT410		979.0	20.0	Not Available	0.1	Stable	MSKCC	58.0	NO	NO																
+P-0002768	P-0002768-T02-IM6	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma		Matched	5.1881885699	luad_mskimpact_2021							4/17/18	2018/04	2018, Wk. 16		Primary	Tumor	Not Applicable	Lung	IMPACT468	Note: Low tumor content (approximately 20% or less).  Negative mutation, copy number and structural variant results, as well as low (stable) MSIsensor scores, should be interpreted with caution.	646.0	30.0	MICROSATELLITE STABLE (MSS). See MSI note below.	0.0	Stable	MSKCC	52.0	NO	YES	1009141.0															
+P-0012076	P-0012076-T01-IM5	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma		Matched	4.89359848807	luad_mskimpact_2021							6/10/16	2016/06	2016, Wk. 23		Primary	Tumor	Not Applicable	Lung	IMPACT410		1021.0	20.0	Not Available	0.08	Stable	MSKCC	72.0	NO	YES	430368.0															
+AU5884	AU5884	LUAD	Lung cancer	Lung Adenocarcinoma		Matched	1.13333333333	nsclc_mskcc_2015											Primary	Tumor																	Frozen	Lung	128.058385	70.843604									
+BL3403	BL3403	LUAD	Lung cancer	Lung Adenocarcinoma		Matched	4.7	nsclc_mskcc_2015											Met	Tumor																	FFPE	Pleura	178.814652	142.309651									
+CA9903	CA9903	LUAD	Lung cancer	Lung Adenocarcinoma		Matched	10.5333333333	nsclc_mskcc_2015											Primary	Tumor																	FFPE	Lung	118.675283	71.664856									
+DI6359	DI6359	LUAD	Lung cancer	Lung Adenocarcinoma		Matched	7.53333333333	nsclc_mskcc_2015											Met	Tumor																	FFPE	Lymph node	154.345326	74.122135									
+GR4788	GR4788	LUSC	Lung cancer	Lung Squamous Cell Carcinoma		Matched	5.63333333333	nsclc_mskcc_2015											Met	Tumor																	Frozen	Bronchus	128.244339	131.869851									
+HE3202	HE3202	LUAD	Lung cancer	Lung Adenocarcinoma		Matched	24.0333333333	nsclc_mskcc_2015											Met	Tumor																	FFPE	Lymph node	189.705252	89.139081									
+JB112852	JB112852	LUAD	Lung cancer	Lung Adenocarcinoma		Matched	6.06666666667	nsclc_mskcc_2015											Primary	Tumor																	FFPE	Lung	198.480088	131.38132									
+KA3947	KA3947	LUAD	Lung cancer	Lung Adenocarcinoma		Matched	9.8	nsclc_mskcc_2015											Met	Tumor																	Frozen	Lymph node	162.673575	81.930577									
+MA7027	MA7027	LUAD	Lung cancer	Lung Adenocarcinoma		Matched	9.36666666667	nsclc_mskcc_2015											Primary	Tumor																	FFPE	Lung	129.24121	83.373941									
+RI1933	RI1933	LUAD	Lung cancer	Lung Adenocarcinoma		Matched	15.5333333333	nsclc_mskcc_2015											Met	Tumor																	FFPE	Lymph node	164.985052	68.188206									
+RO3338	RO3338	LUAD	Lung cancer	Lung Adenocarcinoma		Matched	3.5	nsclc_mskcc_2015											Primary	Tumor																	FFPE	Lung	126.57824	121.010249									
+SC0899	SC0899	LUAD	Lung cancer	Lung Adenocarcinoma		Matched	9.66666666667	nsclc_mskcc_2015											Primary	Tumor																	Frozen	Lung	134.579314	93.073728									
+SC6470	SC6470	LUAD	Lung cancer	Lung Adenocarcinoma		Matched	5.96666666667	nsclc_mskcc_2015											Met	Tumor																	Frozen	Lung	144.26427	61.39547									
+TU0428	TU0428	LUAD	Lung cancer	Lung Adenocarcinoma		Matched	20.2666666667	nsclc_mskcc_2015											Primary	Tumor																	FFPE	Lung	113.278032	130.048835									
+VA1330	VA1330	LUAD	Lung cancer	Lung Adenocarcinoma		Matched	1.33333333333	nsclc_mskcc_2015											Met	Tumor																	Frozen	Lung	125.711679	71.166279									
+VA7859	VA7859	LUAD	Lung cancer	Lung Adenocarcinoma		Matched	0.3	nsclc_mskcc_2015											Met	Tumor																	Frozen	Lung	151.640293	70.285595									
+P-0000913	P-0000913-T02-IM5	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma		Matched	3.91487879046	nsclc_pd1_msk_2018															IMPACT410																								3.773584906	0.14	0.0
+P-0005975	P-0005975-T01-IM5	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma		Matched	10.7659166738	nsclc_pd1_msk_2018															IMPACT410																								10.37735849	0.14	0.0
+P-0006343	P-0006343-T01-IM5	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma		Matched	5.87231818569	nsclc_pd1_msk_2018															IMPACT410																								5.660377358	0.01	50.0
+P-0007121	P-0007121-T01-IM5	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma		Matched	7.82975758092	nsclc_pd1_msk_2018															IMPACT410																								7.547169811	0.0	1.0
+P-0008176	P-0008176-T01-IM5	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma		Matched	3.91487879046	nsclc_pd1_msk_2018															IMPACT410																								3.773584906	0.05	0.0
+P-0012076	P-0012076-T01-IM5	LUAD	Non-Small Cell Lung Cancer	Lung Adenocarcinoma		Matched	4.89359848807	nsclc_pd1_msk_2018															IMPACT410																								4.716981132	0.02	

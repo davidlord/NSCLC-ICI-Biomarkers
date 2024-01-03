@@ -1,27 +1,19 @@
 #!/usr/bin/env python3
 print("helo")
 
-# Import packages:
+# IMPORT packages:
 import os
 import re
 import pandas as pd
 import glob
 import matplotlib.pyplot as plt
 
-### TEMP path
-C:\Users\kxvz994\Documents\NSCLC-ICI-Biomarkers\Data-Preparation
-
-
 
 # DEFINE PARAMETERS
-
 ### Move some of these to config file?
+data_path = "./Data"
 mutations_file = "mutations.txt"
 column_names_config_file = "column_names_config.txt"
-
-
-# Relative path to data folders directory
-data_path = './Data'
 
 # File names from cBioPortal: 
 patient_file_name = 'data_clinical_patient.txt'
@@ -29,13 +21,13 @@ sample_file_name = 'data_clinical_sample.txt'
 mutation_file_name = 'data_mutations.txt'
 
 
+
+
 #===============================================================
 # DEFINE FUNCTIONS
 #===============================================================
 
 
-# DATA HANDLING & PROCESSING
-#---------------------------------------------------------------
 # READ lines from text file
 def read_lines_from_file(filename):
     lines = []
@@ -99,7 +91,7 @@ def add_dataframe_name_column(dataframes_dict):
 
 
 # Concatinate dataframes in dict into single dataframe: 
-def concatinate_dfs(df_dict):
+def concatenate_dfs(df_dict):
     dfs = []
     for df in df_dict.values():
         dfs.append(df)
@@ -107,9 +99,6 @@ def concatinate_dfs(df_dict):
     
     return concatinated_df
 
-
-  # DATA HARMONIZATION FUNCTIONS
-#---------------------------------------------------------------
 
 # Check if column_names.txt file exists or not
 def check_column_names_file():
@@ -196,7 +185,7 @@ def write_categorical_columns_to_file(df, output_file):
 
 
 # READ MUTATIONS of interest text file
-mutations_of_interest_list = read_lines_from_file("mutations.txt")
+mutations_of_interest_list = read_lines_from_file(mutations_file)
 print("Mutations of interest as specified in file: ")
 for mut in mutations_of_interest_list:
     print(mut)
@@ -208,7 +197,7 @@ data_included = get_data_dirs(data_path)
 
 # REMOVE COMMENTED LINES from data files
     # Clinical data: 
-remove_commented_lines(data_included, clinical_file_name)
+remove_commented_lines(data_included, patient_file_name)
     # Sample data: 
 remove_commented_lines(data_included, sample_file_name)
     # Mutations data:
@@ -221,11 +210,7 @@ sample_dfs = {}
 mutation_dfs = {}
 
 
-for df_name in clinical_dfs.keys():
-    print(df_name)
-
-
-# READ DATA tables into dictionary of dataframes
+# READ DATA tables into dictionaries of dataframes
     # Clinical data: 
 read_data(data_included, patient_file_name, patient_dfs)
     # Sample data:
@@ -243,27 +228,33 @@ add_dataframe_name_column(sample_dfs)
 add_dataframe_name_column(mutation_dfs)
 
 
-
 # CONCATINATE DATAFRAMES in dicts into single dataframe
     # Patient data:
-all_patient_data = concatinate_dfs(patient_dfs)
-=======
-# CONCATENATE DATAFRAMES in dicts into single dataframe
-    # Clinical data:
-all_clinical_data = concatinate_dfs(clinical_dfs)
-
-
+all_patient_data = concatenate_dfs(patient_dfs)
     # Sample data: 
-all_sample_data = concatinate_dfs(sample_dfs)
+all_sample_data = concatenate_dfs(sample_dfs)
     # Mutational data:
-all_mutations_data = concatinate_dfs(mutation_dfs)
-
-
+all_mutations_data = concatenate_dfs(mutation_dfs)
 
 
 
 # JOIN clinical- and sample dataframes to single
 patient_sample_data = pd.merge(all_patient_data, all_sample_data, on='PATIENT_ID', how='left')
+
+
+
+### How to deal with duplicates? 
+duplicated_patients = all_patient_data[all_patient_data.duplicated('PATIENT_ID', keep=False)]
+duplicated_patients.to_csv('duplicated_patients.txt', sep='\t', index=False)
+
+duplicated_samples = all_sample_data[all_sample_data.duplicated('SAMPLE_ID', keep=False)]
+duplicated_samples.to_csv('duplicated_samples.txt', sep='\t', index=False)
+
+duplicated_patientSampleData = patient_sample_data[patient_sample_data.duplicated('PATIENT_ID', keep=False)]
+duplicated_patientSampleData.to_csv('duplicated_patientSampleData.txt', sep='\t', index=False)
+
+
+
 
 
 # READ columns of interest txt file
