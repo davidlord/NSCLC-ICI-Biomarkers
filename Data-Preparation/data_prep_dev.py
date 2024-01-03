@@ -1,28 +1,20 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May  1 19:01:44 2023
-@author: davidlord
-"""
+print("helo")
+
 # Import packages:
 import os
 import re
 import pandas as pd
 import glob
 import matplotlib.pyplot as plt
-import seaborn as sns
-
-
-os.getcwd()
-os.chdir('/Users/davidlord/Documents/GitHub/NSCLC-ICI-Biomarkers/Data-Preparation')
 
 
 #===============================================================
 # DEFINE PARAMETERS
 #===============================================================
-# Move some of these to config file?
+### Move some of these to config file?
 
-mutations_file_path = "mutations.txt"
+mutations_file = "mutations.txt"
 column_names_config_file = "column_names_config.txt"
 
 
@@ -38,6 +30,15 @@ mutation_file_name = 'data_mutations.txt'
 #===============================================================
 # DEFINE FUNCTIONS
 #===============================================================
+
+# READ lines from text file
+def read_lines_from_file(filename):
+    lines = []
+    with open(filename, 'r') as file:
+        for line in file:
+            lines.append(line.strip())
+    return lines
+
 
 # Create a list of study data included in Data folder
 def get_data_dirs(directory):
@@ -85,7 +86,12 @@ def read_data(path_list, name, data_dict):
 def add_dataframe_name_column(dataframes_dict):
     for df_name in dataframes_dict:
         df = dataframes_dict[df_name]
-        df['study_name'] = re.search(r'(?<=Data\/).*', df_name).group()
+        # Use the updated regex pattern
+        match = re.search(r'\./Data\\(.*)', df_name)
+        if match:
+            df['study_name'] = match.group(1)
+        else:
+            df['study_name'] = 'default_value'
 
 
 # Concatinate dataframes in dict into single dataframe: 
@@ -105,14 +111,6 @@ def check_column_names_file():
         return True
     else:
         return False
-
-# READ lines from text file
-def read_lines_from_file(filename):
-    lines = []
-    with open(filename, 'r') as file:
-        for line in file:
-            lines.append(line.strip())
-    return lines
 
 
 # SEARCH for FILENAME
@@ -194,15 +192,15 @@ def write_categorical_columns_to_file(df, output_file):
 # EXECUTE FUNCTIONS
 #===============================================================
 
-
 # DATA PREPARATION
-#====================================================================
+#===============================================================
 
-# REAT MUTATIONS of interest text file
+# READ MUTATIONS of interest text file
 mutations_of_interest_list = read_lines_from_file("mutations.txt")
 print("Mutations of interest specified in file: ")
 for mut in mutations_of_interest_list:
     print(mut)
+
 
 # GET PATH to directories included in data folder
 data_included = get_data_dirs(data_path)
@@ -222,6 +220,10 @@ clinical_dfs = {}
 sample_dfs = {}
 mutation_dfs = {}
 
+for df_name in clinical_dfs.keys():
+    print(df_name)
+
+
 # READ DATA tables into dictionary of dataframes
     # Clinical data: 
 read_data(data_included, clinical_file_name, clinical_dfs)
@@ -229,6 +231,7 @@ read_data(data_included, clinical_file_name, clinical_dfs)
 read_data(data_included, sample_file_name, sample_dfs)
     # Mutations data: 
 read_data(data_included, mutation_file_name, mutation_dfs)
+
 
 # ADD STUDY NAME as column to dataframes in dictionaries
     # Clinical data: 
@@ -238,7 +241,8 @@ add_dataframe_name_column(sample_dfs)
     # Mutations data:
 add_dataframe_name_column(mutation_dfs)
 
-# CONCATINATE DATAFRAMES in dicts into single dataframe
+
+# CONCATENATE DATAFRAMES in dicts into single dataframe
     # Clinical data:
 all_clinical_data = concatinate_dfs(clinical_dfs)
     # Sample data: 
@@ -246,8 +250,14 @@ all_sample_data = concatinate_dfs(sample_dfs)
     # Mutational data:
 all_mutations_data = concatinate_dfs(mutation_dfs)
 
-# JOIN clinical- and sample dataframes to single
+
+# JOIN clinical- and sample dataframes to single df
 patient_sample_data = pd.merge(all_clinical_data, all_sample_data, on='PATIENT_ID', how='left')
+
+
+
+duplicates = patient_sample_data[patient_sample_data.duplicated('PATIENT_ID', keep=False)]
+duplicates.columns
 
 
 # GET USER INPUT TO DEFINE DATA PROCESSING
