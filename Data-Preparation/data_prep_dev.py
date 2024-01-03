@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May  1 19:01:44 2023
-@author: davidlord
-"""
+print("helo")
+
 # Import packages:
 import os
 import re
@@ -13,15 +10,10 @@ import matplotlib.pyplot as plt
 
 
 
-os.getcwd()
-os.chdir('/Users/davidlord/Documents/GitHub/NSCLC-ICI-Biomarkers/Data-Preparation')
-
-
 # DEFINE PARAMETERS
-#---------------------------------------------------------------
-# Move some of these to config file?
 
-mutations_file_path = "mutations.txt"
+### Move some of these to config file?
+mutations_file = "mutations.txt"
 column_names_config_file = "column_names_config.txt"
 
 
@@ -38,9 +30,9 @@ mutation_file_name = 'data_mutations.txt'
 # DEFINE FUNCTIONS
 #===============================================================
 
+
 # DATA HANDLING & PROCESSING
 #---------------------------------------------------------------
-
 # READ lines from text file
 def read_lines_from_file(filename):
     lines = []
@@ -48,6 +40,7 @@ def read_lines_from_file(filename):
         for line in file:
             lines.append(line.strip())
     return lines
+
 
 # Create a list of study data included in Data folder
 def get_data_dirs(directory):
@@ -94,7 +87,12 @@ def read_data(path_list, name, data_dict):
 def add_dataframe_name_column(dataframes_dict):
     for df_name in dataframes_dict:
         df = dataframes_dict[df_name]
-        df['study_name'] = re.search(r'(?<=Data\/).*', df_name).group()
+        # Use the updated regex pattern
+        match = re.search(r'\./Data\\(.*)', df_name)
+        if match:
+            df['study_name'] = match.group(1)
+        else:
+            df['study_name'] = 'default_value'
 
 
 # Concatinate dataframes in dict into single dataframe: 
@@ -107,9 +105,16 @@ def concatinate_dfs(df_dict):
     return concatinated_df
 
 
-
-# DATA HARMONIZATION FUNCTIONS
+  # DATA HARMONIZATION FUNCTIONS
 #---------------------------------------------------------------
+
+# Check if column_names.txt file exists or not
+def check_column_names_file():
+    file_name = 'column_names.txt'
+    if os.path.isfile(file_name):
+        return True
+    else:
+        return False
 
 # SEARCH for FILENAME
 def search_file_in_current_directory(filename):
@@ -186,10 +191,8 @@ def write_categorical_columns_to_file(df, output_file):
 # EXECUTE FUNCTIONS
 #===============================================================
 
-# DATA HANDLING & PREPROCESSING
-#---------------------------------------------------------------
 
-# REAT MUTATIONS of interest text file
+# READ MUTATIONS of interest text file
 mutations_of_interest_list = read_lines_from_file("mutations.txt")
 print("Mutations of interest as specified in file: ")
 for mut in mutations_of_interest_list:
@@ -215,6 +218,10 @@ sample_dfs = {}
 mutation_dfs = {}
 
 
+for df_name in clinical_dfs.keys():
+    print(df_name)
+
+
 # READ DATA tables into dictionary of dataframes
     # Clinical data: 
 read_data(data_included, patient_file_name, patient_dfs)
@@ -233,13 +240,23 @@ add_dataframe_name_column(sample_dfs)
 add_dataframe_name_column(mutation_dfs)
 
 
+
 # CONCATINATE DATAFRAMES in dicts into single dataframe
     # Patient data:
 all_patient_data = concatinate_dfs(patient_dfs)
+=======
+# CONCATENATE DATAFRAMES in dicts into single dataframe
+    # Clinical data:
+all_clinical_data = concatinate_dfs(clinical_dfs)
+
+
     # Sample data: 
 all_sample_data = concatinate_dfs(sample_dfs)
     # Mutational data:
 all_mutations_data = concatinate_dfs(mutation_dfs)
+
+
+
 
 
 # JOIN clinical- and sample dataframes to single
@@ -248,6 +265,17 @@ patient_sample_data = pd.merge(all_patient_data, all_sample_data, on='PATIENT_ID
 
 # READ columns of interest txt file
 keep_cols = read_lines_from_file("columns_of_interest.txt")
+=======
+# JOIN clinical- and sample dataframes to single df
+patient_sample_data = pd.merge(all_clinical_data, all_sample_data, on='PATIENT_ID', how='left')
+
+
+
+duplicates = patient_sample_data[patient_sample_data.duplicated('PATIENT_ID', keep=False)]
+duplicates.columns
+
+
+
 
 # FILTER: Keep only columns of interest
 patient_sample_data_filtered = patient_sample_data.filter(keep_cols)
