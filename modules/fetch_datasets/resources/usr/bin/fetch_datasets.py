@@ -199,8 +199,10 @@ if __name__ == '__main__':
             yaml.dump(config, f)
     # save metadata
     meta = {
-        'studies used': datasets ,
-        'filename': 'data_'+datetime.now().strftime('%b%d%Y')+datetime.now().strftime('%H%M%S')
+        'studies_used': datasets ,
+        'filename': 'data_'+datetime.now().strftime('%b%d%Y')+'_'+datetime.now().strftime('%H%M%S')
+        'feature_names': inputdata.columns.tolist()
+        'number_of_entries': len(inputdata)
     }
     with open("meta.json", 'w') as f:
         json.dump(meta, f)
