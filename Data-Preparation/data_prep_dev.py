@@ -7,6 +7,7 @@ import re
 import pandas as pd
 import glob
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 # DEFINE PARAMETERS
@@ -14,12 +15,13 @@ import matplotlib.pyplot as plt
 data_path = "./Data"
 mutations_file = "mutations.txt"
 column_names_config_file = "column_names_config.txt"
+columns_of_interest_file = "columns_of_interest.txt"
+column_names_harmonization_file = "column_names_harmonization.txt"
 
 # File names from cBioPortal: 
 patient_file_name = 'data_clinical_patient.txt'
 sample_file_name = 'data_clinical_sample.txt'
 mutation_file_name = 'data_mutations.txt'
-
 
 
 
@@ -68,7 +70,7 @@ def remove_commented_lines(path_list, name):
 
 # Read file that matches name in path into dictionary of dataframes
 # Loop over directories included
-def read_data(path_list, name, data_dict):
+def read_data_to_dict(path_list, name, data_dict):
     for path in path_list:
     # Read data files:
         file_path = os.path.join(path, name)
@@ -87,7 +89,7 @@ def add_dataframe_name_column(dataframes_dict):
         if match:
             df['study_name'] = match.group(1)
         else:
-            df['study_name'] = 'default_value'
+            df['study_name'] = ''
 
 
 # Concatinate dataframes in dict into single dataframe: 
@@ -100,37 +102,34 @@ def concatenate_dfs(df_dict):
     return concatinated_df
 
 
-# Check if column_names.txt file exists or not
-def check_column_names_file():
-    file_name = 'column_names.txt'
-    if os.path.isfile(file_name):
-        return True
-    else:
-        return False
+def remove_duplicates_keep_least_nulls(df, key_column):
+    """
+    Remove duplicate rows based on a key column while keeping the row 
+    with the fewest null values in other columns.
 
-# SEARCH for FILENAME
-def search_file_in_current_directory(filename):
-    file_status = False
-    current_directory = os.getcwd()
+    Parameters:
+    df (pandas.DataFrame): The DataFrame to process.
+    key_column (str): The name of the column to identify duplicates.
 
-    for root, _, files in os.walk(current_directory):
-        for file in files:
-            if file == filename:
-                return os.path.join(root, file)
-                file_status = True
+    Returns:
+    pandas.DataFrame: DataFrame with duplicates removed.
+    """
+    # Count non-null values in each row
+    non_null_counts = df.apply(lambda row: row.notnull().sum(), axis=1)
 
-    return file_status
-    
+    # Add the counts as a temporary column
+    df['_non_null_counts'] = non_null_counts
 
-### TO BE REMOVED ###
-# WRITE text file 
-def write_txt_file(text_body, output_file_path):
-    try:
-        with open(output_file_path, 'w') as text_file:
-            text_file.write(text_body)
-    except Exception as e:
-        print(f"Error occurred while writing to the text file: {e}")
-### TO BE REMOVED ###
+    # Sort by key column and non-null counts (descending)
+    df = df.sort_values(by=[key_column, '_non_null_counts'], ascending=[True, False])
+
+    # Drop duplicates keeping the first (which has the most non-null values)
+    df = df.drop_duplicates(subset=key_column, keep='first')
+
+    # Drop the temporary count column
+    df = df.drop(columns=['_non_null_counts'])
+
+    return df
 
 
 # PARSE column_name_harmonization.txt
@@ -152,15 +151,32 @@ def parse_column_name_harmonization(file_path):
     return parsed_dict
 
 
-# CHANGE column names based on dictionary of lists
-def change_column_names(df_partitions_dict, parsed_dict):
-    for df_key, df in df_partitions_dict.items():
-        for column_name in df.columns:
-            for key, value_list in parsed_dict.items():
-                if column_name in value_list:
-                    new_column_name = key
-                    df.rename(columns={column_name: new_column_name}, inplace=True)
+def rename_columns_based_on_synonyms(dataframe, synonyms_dict):
+    """
+    Renames columns in the DataFrame based on the provided synonyms dictionary.
 
+    Args:
+    dataframe (pd.DataFrame): The DataFrame whose columns need to be renamed.
+    synonyms_dict (dict): A dictionary where each key is the new column name,
+                          and the value is a list of synonyms for that column.
+
+    Returns:
+    pd.DataFrame: The DataFrame with renamed columns.
+    """
+    for new_column_name, synonyms in synonyms_dict.items():
+        for synonym in synonyms:
+            if synonym in dataframe.columns:
+                dataframe.rename(columns={synonym: new_column_name}, inplace=True)
+
+    return dataframe
+
+
+#### DEV BELOW ####
+#### DEV BELOW ####
+#### DEV BELOW ####
+#### DEV BELOW ####
+#### DEV BELOW ####
+#### DEV BELOW ####
 
 # WRITE column entries in harmonized column names df
 def write_categorical_columns_to_file(df, output_file):
@@ -212,11 +228,11 @@ mutation_dfs = {}
 
 # READ DATA tables into dictionaries of dataframes
     # Clinical data: 
-read_data(data_included, patient_file_name, patient_dfs)
+read_data_to_dict(data_included, patient_file_name, patient_dfs)
     # Sample data:
-read_data(data_included, sample_file_name, sample_dfs)
+read_data_to_dict(data_included, sample_file_name, sample_dfs)
     # Mutations data: 
-read_data(data_included, mutation_file_name, mutation_dfs)
+read_data_to_dict(data_included, mutation_file_name, mutation_dfs)
 
 
 # ADD STUDY NAME as column to dataframes in dictionaries
@@ -237,60 +253,101 @@ all_sample_data = concatenate_dfs(sample_dfs)
 all_mutations_data = concatenate_dfs(mutation_dfs)
 
 
+### TEMP ANALYTICS ###
+all_patient_data['study_name'].value_counts()
+all_sample_data['study_name'].value_counts()
+all_mutations_data['study_name'].value_counts()
+### TEMP ANALYTICS ###
+
 
 # JOIN clinical- and sample dataframes to single
-patient_sample_data = pd.merge(all_patient_data, all_sample_data, on='PATIENT_ID', how='left')
+all_patient_sample_data = pd.merge(all_patient_data, all_sample_data, on='PATIENT_ID', how='left')
 
 
-
-### How to deal with duplicates? 
-duplicated_patients = all_patient_data[all_patient_data.duplicated('PATIENT_ID', keep=False)]
-duplicated_patients.to_csv('duplicated_patients.txt', sep='\t', index=False)
-
-duplicated_samples = all_sample_data[all_sample_data.duplicated('SAMPLE_ID', keep=False)]
-duplicated_samples.to_csv('duplicated_samples.txt', sep='\t', index=False)
-
-duplicated_patientSampleData = patient_sample_data[patient_sample_data.duplicated('PATIENT_ID', keep=False)]
-duplicated_patientSampleData.to_csv('duplicated_patientSampleData.txt', sep='\t', index=False)
-
-
-
+# REMOVE DUPLICATES from patient-sample data,
+# retain rows containing least null values
+all_patient_sample_data = remove_duplicates_keep_least_nulls(all_patient_sample_data, 'PATIENT_ID')
 
 
 # READ columns of interest txt file
-keep_cols = read_lines_from_file("columns_of_interest.txt")
-=======
-# JOIN clinical- and sample dataframes to single df
-patient_sample_data = pd.merge(all_clinical_data, all_sample_data, on='PATIENT_ID', how='left')
-
-
-
-duplicates = patient_sample_data[patient_sample_data.duplicated('PATIENT_ID', keep=False)]
-duplicates.columns
-
-
+keep_cols = read_lines_from_file(columns_of_interest_file)
+print("columns of interest:")
+for col in keep_cols:
+    print(col)
 
 
 # FILTER: Keep only columns of interest
-patient_sample_data_filtered = patient_sample_data.filter(keep_cols)
+all_patient_sample_data_filtered = all_patient_sample_data.filter(keep_cols)
 
 
-# HARMONIZE Column names
+
+
+### TEMP ANALYTICS ###
+# Create a boolean DataFrame where True is null
+null_values = all_patient_sample_data_filtered.isnull()
+
+# Set up the matplotlib figure
+plt.figure(figsize=(30, 8))
+
+# Draw a heatmap with the boolean values and no cell labels
+sns.heatmap(null_values, cbar=False, yticklabels=False)
+plt.title("Heatmap of Null Values in DataFrame")
+plt.show()
+### TEMP ANALYTICS ###
+
+
+# Read lists of column name synonyms to dict
 column_name_synonyms = {}
-column_name_synonyms = parse_column_name_harmonization("column_names_config.txt")
+column_name_synonyms = parse_column_name_harmonization(column_names_harmonization_file)
 
 
-for new_column_name, synonyms in column_name_synonyms.items():
-    for synonym in synonyms:
-        if synonym in patient_sample_data_filtered.columns:
-            patient_sample_data_filtered.rename(columns={synonym: new_column_name}, inplace=True)
+# HARMONIZE Column names based on synonyms in dict
+all_patient_sample_data_filtered = rename_columns_based_on_synonyms(all_patient_sample_data_filtered, column_name_synonyms)
 
 
-# Group by column name and sum the values
-merged_df = patient_sample_data_filtered.groupby(patient_sample_data_filtered.columns, axis=1).sum()
+### DEV DEV DEV ###
+
+
+# Nested loop over columns using column names
+for col_i in df:
+    for col_j in df:
+        # Access columns directly by name
+        column_i = df[col_i]
+        column_j = df[col_j]
+
+        # Example operation: print column names
+        print(f"Comparing {col_i} and {col_j}")
+
+        # Insert your operation here
+        
+
+
+test_func(all_patient_sample_data_filtered)
+
+
+
+
+
+
+
+#### DEV BELOW ####
+#### DEV BELOW ####
+#### DEV BELOW ####
+#### DEV BELOW ####
+#### DEV BELOW ####
+#### DEV BELOW ####
+
+print(all_patient_sample_data_filtered.columns)
+
+
+
+
 
 
 print(merged_df)
+
+
+
 
 ### TEMP ###
 # Get column names
@@ -366,51 +423,6 @@ for gene in mutations_of_interest_list:
 
 
 
-# DATA HARMONIZATION
-#---------------------------------------------------------------
-
-###  DATA INVESTIGATION  ###
-###  DATA INVESTIGATION  ###
-# Columns of interest
-print(patient_sample_data['PED_IND'])
-
-null_count = patient_sample_data['PED_IND'].isnull().sum()
-print(null_count)
-###  DATA INVESTIGATION  ###
-###  DATA INVESTIGATION  ###
-
-
-
-
-###  DEV HERE  ###
-###  DEV HERE  ###
-###  DEV HERE  ###
-###  DEV HERE  ###
-
-
-
-
-    
-###  DEV HERE  ###
-###  DEV HERE  ###
-###  DEV HERE  ###
-###  DEV HERE  ###
-
-
-
-
-#### OLD CODE BELOW #####
-#### OLD CODE BELOW #####
-#### OLD CODE BELOW #####
-#### OLD CODE BELOW #####
-
-
-
-
-#--------------------------------
-
-# APPLY changes
-#-------------------------------
 
 
 # STEP 3: Get input for categories harmonization
@@ -425,11 +437,7 @@ categories_harmonization_string = "# Please define the categories that represent
 categories_harmonization_string = categories_harmonization_string + '# "SMOKING_STATUS": "SMOKER"="YES", "NO"="NON-SMOKER"="N"\n'
 categories_harmonization_string = categories_harmonization_string + '# "SEX": "MALE"="M"="male", "FEMALE"="F"="female"'
 
-# WRITE column name harmonization txt file
-write_txt_file(categories_harmonization_string, "column_name_harmonization.txt")
 
-# WAIT for user to provide input
-wait_for_confirmation()
 
 # APPLY changes
 #-------------------------------
