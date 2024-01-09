@@ -177,6 +177,9 @@ def rename_columns_based_on_synonyms(dataframe, synonyms_dict):
 #### DEV BELOW ####
 #### DEV BELOW ####
 #### DEV BELOW ####
+#### DEV BELOW ####
+#### DEV BELOW ####
+#### DEV BELOW ####
 
 # WRITE column entries in harmonized column names df
 def write_categorical_columns_to_file(df, output_file):
@@ -260,7 +263,7 @@ all_mutations_data['study_name'].value_counts()
 ### TEMP ANALYTICS ###
 
 
-# JOIN clinical- and sample dataframes to single
+# JOIN patient- and sample dataframes to single
 all_patient_sample_data = pd.merge(all_patient_data, all_sample_data, on='PATIENT_ID', how='left')
 
 
@@ -281,18 +284,21 @@ all_patient_sample_data_filtered = all_patient_sample_data.filter(keep_cols)
 
 
 
-
+### TEMP ANALYTICS ###
 ### TEMP ANALYTICS ###
 # Create a boolean DataFrame where True is null
+all_patient_sample_data_filtered = all_patient_sample_data_filtered.replace('', pd.NA)
+
 null_values = all_patient_sample_data_filtered.isnull()
 
 # Set up the matplotlib figure
-plt.figure(figsize=(30, 8))
+plt.figure(figsize=(35, 8))
 
 # Draw a heatmap with the boolean values and no cell labels
 sns.heatmap(null_values, cbar=False, yticklabels=False)
 plt.title("Heatmap of Null Values in DataFrame")
 plt.show()
+### TEMP ANALYTICS ###
 ### TEMP ANALYTICS ###
 
 
@@ -304,47 +310,20 @@ column_name_synonyms = parse_column_name_harmonization(column_names_harmonizatio
 # HARMONIZE Column names based on synonyms in dict
 all_patient_sample_data_filtered = rename_columns_based_on_synonyms(all_patient_sample_data_filtered, column_name_synonyms)
 
+# GROUP BY column name, keep only one entry if for each row
+# for columns that share the same name
+all_patient_sample_data_filtered = all_patient_sample_data_filtered.fillna('').astype(str).groupby(level=0, axis=1).apply(lambda x: x.apply(lambda y: next((item for item in y if item), ''), axis=1))
 
-### DEV DEV DEV ###
-
-
-# Nested loop over columns using column names
-for col_i in df:
-    for col_j in df:
-        # Access columns directly by name
-        column_i = df[col_i]
-        column_j = df[col_j]
-
-        # Example operation: print column names
-        print(f"Comparing {col_i} and {col_j}")
-
-        # Insert your operation here
-        
-
-
-test_func(all_patient_sample_data_filtered)
-
-
-
-
-
-
-
-#### DEV BELOW ####
-#### DEV BELOW ####
-#### DEV BELOW ####
-#### DEV BELOW ####
-#### DEV BELOW ####
-#### DEV BELOW ####
 
 print(all_patient_sample_data_filtered.columns)
 
 
-
-
-
-
-print(merged_df)
+#### DEV BELOW ####
+#### DEV BELOW ####
+#### DEV BELOW ####
+#### DEV BELOW ####
+#### DEV BELOW ####
+#### DEV BELOW ####
 
 
 
