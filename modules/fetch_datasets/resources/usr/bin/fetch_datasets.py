@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Import packages:
 import argparse
@@ -8,7 +8,6 @@ import os
 import re
 import pandas as pd
 import glob
-import argparse
 import difflib
 from datetime import datetime
 from itertools import chain
@@ -91,13 +90,12 @@ class FetchData(object):
         keep_cols = [key for key, val in result.items() if 'NONSYNONYMOUS' not in key]
         keep_cols+=['STUDY_NAME']
         def change_names(torename, def_dict):
-        #change names of columns within dictionaries to match keys created from features
-           for k,v in def_dict.items():
-               for i in torename:
-                    for j in torename[i].columns:
-                        col = str(j).upper()
-                        if col in k or col in v:
-                            torename[i] = torename[i].rename(columns={j:k})
+            #change names of columns within dictionaries to match keys created from features
+            col_map = {col:key for key, cols in def_dict.items() for col in cols}
+            for i in torename:
+                columns = torename[i].columns
+                torename[i].columns = [x.upper() for x in columns]
+                torename[i] = torename[i].rename(columns=col_map)
         def concatinate_dfs(df_dict, filterCols):
             dfs_to_concat, dfs =[], []
             #add study name col
@@ -109,7 +107,7 @@ class FetchData(object):
                 dfs.append(df)
                 for df in dfs:
                     df = df.loc[:, ~df.columns.duplicated(keep='first')]
-                    dfs_to_concat.append(df) 
+                    dfs_to_concat.append(df)
             concatinated_df = pd.concat(dfs_to_concat, ignore_index = True)
             concatinated_df = concatinated_df.filter(filterCols)
             return concatinated_df
@@ -133,7 +131,7 @@ class FetchData(object):
         m_lst = [ ele for ele in [l.split(',') for l in ','.join(mut_list).split('\n')] if ele != ['']]
         # replace string before = in each element within each list and strip whitespace
         muts = [[re.sub('\w+[=]+', '', y).strip() for y in x] for x in m_lst]
-        mutDF = pd.crosstab( all_mut_data['TUMOR_SAMPLE_BARCODE'], [ all_mut_data['HUGO_SYMBOL']], dropna=False).astype(int)
+        mutDF = pd.crosstab( all_mut_data['TUMOR_SAMPLE_BARCODE'], all_mut_data['HUGO_SYMBOL'], dropna=False).astype(int)
         # if count is greater than 2 set to 1, else 0
         mutDF.iloc[:,1:] = mutDF.iloc[:,1:].applymap(lambda x: 1 if x >= 2 else 0)
         length=len(names)
@@ -143,10 +141,11 @@ class FetchData(object):
         mutDF['TUMOR_SAMPLE_BARCODE'] = mutDF.index
         mutDF.index.name = None
         mutationMerged_dict = all_sample_data.merge(mutDF.rename(columns={'TUMOR_SAMPLE_BARCODE': 'SAMPLE_ID'}), 'left')
-        getCols = [cols for cols in mutationMerged_dict for col in list(chain(*muts))+names if col == cols]
-        mutationMerged_dict = mutationMerged_dict.loc[:,'PATIENT_ID':'STUDY_NAME'].join(mutationMerged_dict.loc[:,getCols].fillna(0).astype(int))
+        getCols = [cols for cols in mutationMerged_dict for col in list(set(chain(*muts)))+names if col == cols]
+        mutationMerged_dict = mutationMerged_dict.loc[:,['PATIENT_ID','SAMPLE_ID']].join(mutationMerged_dict.loc[:,getCols].fillna(0).astype(int))
         # Combine all data:
-        patient_sample_data = pd.merge(all_clinical_data, mutationMerged_dict.merge(all_mut_data.rename(columns={'TUMOR_SAMPLE_BARCODE': 'SAMPLE_ID'}), 'left') , on='PATIENT_ID', how='left')		
+        patient_sample_data = pd.merge(all_clinical_data, mutationMerged_dict.merge(all_mut_data.rename(columns={'TUMOR_SAMPLE_BARCODE': 'SAMPLE_ID'}), 'left') , on=['PATIENT_ID','STUDY_NAME'], how='left')
+        patient_sample_data = patient_sample_data.drop('HUGO_SYMBOL', axis=1)
         return patient_sample_data
 
 def Harmonize(self, *args):
@@ -164,45 +163,54 @@ if __name__ == '__main__':
     # user provided name for each run 
     parser.add_argument('--datatype', help='numerical or categorical', required=True)
     parser.add_argument('--mutations', help='File of mutations of interest', required=False, default='mutations.txt')
+    # user provided test_set_size:
+    parser.add_argument('--test_set_size', help='test set size, default: 0.2', required=False, default=0.2)
+    # user provided seed
+    parser.add_argument('--random_seed', help='random seed, default: 42', required=False, default=42)
+    parser.add_argument('--outdir', help='output directory, default: results', required=False)
+
     args = parser.parse_args()
     datasets = []
     for study in args.dataset_names:
         print(study)
         datasets.append(study)
     inputdata = Harmonize(datasets, args.mutations)
-    print(inputdata)
+    print('Features from Data', inputdata.columns.tolist())
 
+    mydatetime = datetime.now().strftime('%b%d%Y')+'_'+datetime.now().strftime('%H%M%S')
     # save data
-    inputdata.to_csv('data_'+datetime.now().strftime('%b%d%Y')+'_'+datetime.now().strftime('%H%M%S')+'.tsv' , sep='\t')
+    inputdata.to_csv('data_'+mydatetime+'.tsv' , sep='\t',  index=False)
+
     # save config 
-    if args.datatype == "categorical":
+    if args.datatype == "numerical":
         config = {
             'preprocessor_name': "main_preprocessor",
-            'test_set_size': 0.2 ,# Part of data. 1 is all data.
-            'random_seed':  42 ,# sets seed for training/test set splits
-            'output_name': "categorical_preprocess",
+            'test_set_size': args.test_set_size ,# Part of data. 1 is all data.
+            'random_seed': args.random_seed ,# sets seed for training/test set splits
+            'output_name': "numerical_preprocess",
 
-            'data_path': os.path.join(cwd,'outdir','DataPrep','data_'+datetime.now().strftime('%b%d%Y')+'_'+datetime.now().strftime('%H%M%S')+'.tsv')
+            'data_path': os.path.join(cwd, args.outdir ,'DataPrep','data_'+mydatetime+'.tsv')
         }
         with open("preprocess_config.yml", 'w') as f:
             yaml.dump(config, f)
     else:
         config = {
             'preprocessor_name': "non_null_one_hotted",
-            'test_set_size': 0.2, # Part of data. 1 is all data.
-            'random_seed': 42, # sets seed for training/test set splits
-            'output_name': "numerical_preprocess",
+            'test_set_size': args.test_set_size,
+            'random_seed': args.random_seed,
+            'output_name': "categorical_preprocess",
 
-            'data_path': os.path.join(cwd ,'outdir','DataPrep','data_'+datetime.now().strftime('%b%d%Y')+'_'+datetime.now().strftime('%H%M%S')+'.tsv')
+            'data_path': os.path.join(cwd , args.outdir  ,'DataPrep','data_'+mydatetime+'.tsv')
         }
         with open("preprocess_config.yml", 'w') as f:
             yaml.dump(config, f)
     # save metadata
     meta = {
         'studies_used': datasets ,
-        'filename': 'data_'+datetime.now().strftime('%b%d%Y')+'_'+datetime.now().strftime('%H%M%S')
-        'feature_names': inputdata.columns.tolist()
-        'number_of_entries': len(inputdata)
+        'filename': 'data_'+mydatetime,
+        'feature_names': inputdata.columns.tolist(),
+        'number_of_entries': len(inputdata),
+        'categorical_features': inputdata.select_dtypes(include='string').columns.to_list()
     }
     with open("meta.json", 'w') as f:
         json.dump(meta, f)
