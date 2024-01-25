@@ -36,7 +36,6 @@ class Preprocessor:
 
     def _load_data(self) -> pd.DataFrame:
         """Load orignal data from disk."""
-        print(self.config["data_path"])
         return pd.read_csv(self.config["data_path"], sep="\t", header=0, engine='python')
 
 
@@ -83,7 +82,7 @@ class Preprocessor:
         """Load the data from file, process it, and save the results."""
         print("Loading original data set..")
         data = self._load_data()
-        print("Processing..", data.head())
+       # print("Processing..", data.head())
         train_data, test_data = self._preprocess(data)
         print("Saving processed data..")
         self._save(train_data, test_data)
