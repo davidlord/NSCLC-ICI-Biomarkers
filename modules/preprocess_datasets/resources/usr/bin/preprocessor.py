@@ -55,8 +55,8 @@ class Preprocessor:
         )
 
         # Save data.
-        train_data.to_csv(preproc_output / "train_data.csv", index=False)
-        test_data.to_csv(preproc_output / "test_data.csv", index=False)
+        train_data.to_csv(os.path.join(preproc_output, "data" ,"train_data.csv"), index=False)
+        test_data.to_csv(os.path.join(preproc_output , "data" ,"test_data.csv"), index=False)
         print(f"Saved processed data to {preproc_output}")
 
     def _preprocess(self, data) -> Tuple[pd.DataFrame, pd.DataFrame]:
