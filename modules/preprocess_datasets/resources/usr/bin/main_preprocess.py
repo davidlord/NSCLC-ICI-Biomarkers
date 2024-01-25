@@ -29,14 +29,6 @@ def main_process_module(config: dict, df: pd.DataFrame, *args) -> Tuple[pd.DataF
 
 def split_data(data: pd.DataFrame, config: dict) -> Tuple[pd.DataFrame, pd.DataFrame]:
     test_set_size = config["test_set_size"]
-    map = {
-    '0': 0 ,
-    '1': 1}
-    
-    print(data.columns.to_list())
-
-    for k, v in map.items():
-        data.iloc[data['PFS_STATUS'].str.startswith(k, na=False), 'PFS_STATUS'] = v
 
     print(
         f"Splitting the data {int((1-test_set_size)*100)}/{int(test_set_size*100)} for training/test set. "
