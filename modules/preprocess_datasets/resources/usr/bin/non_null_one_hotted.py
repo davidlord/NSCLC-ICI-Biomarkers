@@ -32,17 +32,16 @@ def nn_process(config: dict, df: pd.DataFrame, *args) -> Tuple[pd.DataFrame, pd.
         df = df.drop(columns=args.remove_cols, axis=1, inplace=False)
     else:
         pass
-
     df = df[df['PFS_STATUS'].notna()]
-    print(df.dtypes)
     map = {
     '0': 0 ,
     '1': 1}
     for k, v in map.items():
         df.loc[df['PFS_STATUS'].str.startswith(k, na=False), 'PFS_STATUS'] = v
+    print(set(df['PFS_STATUS']))
 
     # Drop nan values.
-    print("\n---Summarising data before removing nulls.---")
+    #print("\n---Summarising data before removing nulls.---")
     df.info(memory_usage=False) # Prints info.
     #df = df.dropna(how="any", axis=0)
     # creating instance of one-hot-encoder
@@ -59,7 +58,7 @@ def nn_process(config: dict, df: pd.DataFrame, *args) -> Tuple[pd.DataFrame, pd.
     )
 
     print("\n---Summarising data after creating dummy variables.---")
-    df.info(memory_usage=False) # Prints info.
+    #df.info(memory_usage=False) # Prints info.
     print("\n")
 
     return split_data(df, config)
