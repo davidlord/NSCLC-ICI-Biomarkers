@@ -1,18 +1,17 @@
 process preprocess_datasets {
-    beforeScript 'ln -s $baseDir/bin/src/ .'
 
     publishDir "${params.output_dir}",
     mode:'copy',
     saveAs: { fn ->
-        fn.endsWith('.csv') ? "Modelling/data/preprocessed/*/data/${fn}" :
-        fn.endsWith('.yml') ? "configs/models/${fn}" :
+        fn.endsWith('_model_config.yml') ? "configs/models/${fn}" :
         fn
     }
 
     output:
+    path "Modelling/data/preprocessed/*/config/preprocess_config.yml"
     path "*.yml" , emit: config_preproc
-    path "test_data.csv" , emit: train_data
-    path "train_data.csv", emit: test_data
+    path "Modelling/data/preprocessed/*/data/test_data.csv" , emit: train_data
+    path "Modelling/data/preprocessed/*/data/train_data.csv", emit: test_data
 
     input:
     val config_file
