@@ -7,7 +7,7 @@ import yaml
 from pathlib import Path
 from datetime import datetime
 from preprocessor import Preprocessor
-from utils import check_git_status
+#from utils import check_git_status
 
 cwd=os.getcwd().split('work', 1)[0]
 
