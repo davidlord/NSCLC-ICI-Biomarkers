@@ -3,7 +3,8 @@
 # Import packages:
 import argparse
 import json
-import yaml
+import json
+import ruamel.yaml
 import os
 import re
 import pandas as pd
@@ -177,9 +178,10 @@ if __name__ == '__main__':
     inputdata = Harmonize(datasets, args.mutations)
     print('Features from Data', inputdata.columns.tolist())
 
-    mydatetime = datetime.now().strftime('%b%d%Y')+'_'+datetime.now().strftime('%H%M%S')
+    mydatetime = datetime.now().strftime("%Y%m%d-%H%M")
     # save data
     inputdata.to_csv('data_'+mydatetime+'.tsv' , sep='\t',  index=False)
+    yaml = ruamel.yaml.YAML()
 
     # save config 
     if args.datatype == "numerical":
@@ -191,6 +193,9 @@ if __name__ == '__main__':
 
             'data_path': os.path.join(cwd, args.outdir ,'DataPrep','data_'+mydatetime+'.tsv')
         }
+        json_string = json.dumps(config)
+        data = yaml.load(json_string)
+        data.fa.set_block_style()
         with open("preprocess_config.yml", 'w') as f:
             yaml.dump(config, f)
     else:
@@ -202,6 +207,9 @@ if __name__ == '__main__':
 
             'data_path': os.path.join(cwd , args.outdir  ,'DataPrep','data_'+mydatetime+'.tsv')
         }
+        json_string = json.dumps(config)
+        data = yaml.load(json_string)
+        data.fa.set_block_style()
         with open("preprocess_config.yml", 'w') as f:
             yaml.dump(config, f)
     # save metadata
