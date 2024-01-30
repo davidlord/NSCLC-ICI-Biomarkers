@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import git
-import oyaml
+from ruamel.yaml import YAML
 
 
 def read_config(config_path: Path) -> dict:
@@ -18,7 +18,8 @@ def read_config(config_path: Path) -> dict:
         A dict containing the configuration.
     """
     with open(config_path) as file:
-        config = oyaml.safe_load(file)
+        yaml=YAML(typ='safe')
+        config = yaml.load(file)
     return config
 
 def check_git_status()-> None:
@@ -57,12 +58,13 @@ def copy_config(config: dict, path_to_folder: Path, name) -> None:
 
     # Save the configuration to disk.
     with open(path_to_folder / f"{name}.yml", "w") as f:
-        f.write(oyaml.dump(config))
+        yaml=YAML(typ='safe')
+        yaml.dump(config, f)
 
 
 def get_current_datetime() -> str:
     """Returns the current datetime as a string."""
-    return datetime.now().strftime("%Y%m%d-%H%M%S")
+    return datetime.now().strftime("%Y%m%d-%H%M")
 
 
 def create_directory(dir_path: Path) -> None:
@@ -99,7 +101,7 @@ def prepare_save_folder(
         copy_config(configs[config_name], output_dir / "config", config_name)
 
     # Store git status.
-#    save_git_status(output_dir)
+   # save_git_status(output_dir)
 
     return output_dir
 
