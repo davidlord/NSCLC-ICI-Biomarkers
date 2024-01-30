@@ -21,12 +21,14 @@ process preprocess_datasets {
     script:
     if (cols_to_remove == "")
       """
-      PYTHONPATH=$baseDir/bin/src preprocess.py --config_path $config_file --outdir ${params.output_dir} --model_type ${model_type}
+      PYTHONPATH=$baseDir/bin/src preprocess.py --config_path $config_file --outdir ${params.output_dir} --model_type ${model_type} 
+      PYTHONPATH=$baseDir/bin/src config_script.py --config_path $config_file --outdir ${params.output_dir} --model_type ${model_type} 
       """
 
     else if (cols_to_remove != "" )
       """
-      PYTHONPATH=$baseDir/bin/src preprocess.py --config_path $config_file --remove_cols ${cols_to_remove} --outdir ${params.output_dir} --model_type ${model_type}
+      PYTHONPATH=$baseDir/bin/src preprocess.py --config_path $config_file --remove_cols ${cols_to_remove} --outdir ${params.output_dir} --model_type ${model_type}  
+      PYTHONPATH=$baseDir/bin/src config_script.py --config_path $config_file --outdir ${params.output_dir} --model_type ${model_type}
       """
 
 
