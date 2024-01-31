@@ -1,4 +1,4 @@
-# Package Overview
+# NSCLC-ICI-Biomarkers
 
 ## Background
 The identification of certain biomarkers that correlate with immunotherapy treatment outcomes has played a crucial role in guiding the appropriate use of immunotherapies in NSCLC. These biomarkers can provide valuable insights into the likelihood of a patient responding positively to immunotherapy, allowing for more personalized treatment plans and improved therapeutic outcomes. However, the successful integration of biomarker-driven precision oncology relies on the analysis and interpretation of vast and complex datasets, which can be challenging for traditional methodologies. Given this challenge, we aim to in this project deliver a framework to:
@@ -8,7 +8,7 @@ The identification of certain biomarkers that correlate with immunotherapy treat
 We will in this project focus on datasets of NSCLC patients who have undergone immunotherapy.
 
 ## Package Overview
-This code repository contains two main functions: "Data-Preparation" and "Modelling". The function of each of these is explained below. 
+This code repository contains two main processes: "Data-Preparation" and "Modelling". The function of each of these is explained below. 
 
 ### Data Preparation
 Framework for compiling and preparing cancer genomics datasets from the cBioPortal. Source code compiles multiple separate datasets to a single analysis-ready dataset. Output dataset can be used as input for the "Modelling" framework in this repository. 
@@ -18,9 +18,9 @@ A framework for creating a predictive model of NSCLC immunotherapy treatment out
 
 ## Requirements
 
-* 
-*
-* 
+* Unix-like operating system (Linux, macOS, etc)
+* Java >=11
+* Conda or Docker
 
 ## Repository structure
 
@@ -31,6 +31,13 @@ The repository has several parts to it.
 - The **conda.yml** contains conda requirements for pipeline.
 - **bin** contains most of code implementation. Implement new models, plots, and metrics here.
 
+This package can be run using the default settings or without the different modules (fetch_datasets, preprocess_datasets, etc. ).
+
+For example to skip fetching datasets:
+
+```
+--fetch_datasets=false
+```
 
 ## Entry points
 The entry points are executed from the repository root folder using the terminal. Each of them needs some required input (e.g. the path to the corresponding configuration file), which is specified using flags. Which inputs and which flags that should be used to provide the input is specified below and in each entry point's help statement. Access the help statement using the terminal command
@@ -83,8 +90,8 @@ The prediction module uses a model to evaluate a test data set. After the infere
 Available flags
 
 ```
-`--data_path` (Path to the test data on which to run evaluation.)
-`--output_file` (Path to the filename to save prediction/inference data.)
+--data_path (Path to the test data on which to run evaluation.)
+--output_file (Path to the filename to save prediction/inference data.)
 ```
 
 ### Analyisis
@@ -94,7 +101,7 @@ Available flags
 
 ```
 --experiment_folder (Path to the folder of the trained model saved on disk.)
-`--output_path` (Path to the data on which to run evaluation.)
+--output_path (Path to the data on which to run evaluation.)
 ```
 
 
