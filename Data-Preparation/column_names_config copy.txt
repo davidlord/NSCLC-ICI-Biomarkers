@@ -1,2 +1,0 @@
-"SMOKING_STATUS": "SMOKER"="YES", "NO"="NON-SMOKER"="N"
-"SEX": "MALE"="M"="male", "FEMALE"="F"="female"
