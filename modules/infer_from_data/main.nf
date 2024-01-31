@@ -2,14 +2,14 @@ process infer_from_data {
     publishDir "${params.output_dir}",
     mode:'copy',
     saveAs: { fn ->
-        fn.endsWith('.csv') ? "Modelling/output/models/*/inference/${fn}" :
+        fn.endsWith('.csv') ? "Modelling/${fn}" :
         fn.endsWith('.yml') ? "configs/analysis/${fn}" :
         fn
     }
 
     output:
     path "*.yml" , emit: config_preproc
-    path "*.csv" , emit: infer_csv
+    path "Modelling/output/models/*/inference/*.csv" , emit: infer_csv
 
     input:
     path experiment_name
