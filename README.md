@@ -108,5 +108,5 @@ Available flags
 ## Quickstart 
 
 ```
-nextflow run main.nf --profile conda --datatype "categorical" --model_type=xgboost
+nextflow run main.nf -profile conda --datatype "categorical" --model_type=xgboost
 ```
