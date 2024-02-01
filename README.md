@@ -94,7 +94,7 @@ Available flags
 --output_file (Path to the filename to save prediction/inference data.)
 ```
 
-### Analyisis
+### Analysis
 The entry point *analyze.py* creates various plots and computes measures on both the original data and on the inference of a model. If the used model supports it, it can also give some information about the model. The output is saved in a folder specified when executing the entry point.
 
 Available flags
