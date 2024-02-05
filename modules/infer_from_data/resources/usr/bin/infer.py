@@ -11,12 +11,9 @@ from trainer import Trainer
 def main(experiment_folder: Path, data_path: Path, output_file: Path) -> None:
     assert output_file.suffix == ".csv", "ERROR: Output file does not have `.csv` extension! Exiting."
     model_config_path = experiment_folder
-    print('model_config_path ', model_config_path)
     pathlist = os.path.dirname(experiment_folder).split('/')[:-1]
-    print('pathlist', pathlist)
     pathlist = ['/' if x == '' else x for x in pathlist]
     model_path = os.path.join(*pathlist, 'model')
-    print('model_path', model_path)
     trainer = Trainer(model_config_path, resume_model=model_path, data_path=data_path)
     trainer.predict(output_file)
 
