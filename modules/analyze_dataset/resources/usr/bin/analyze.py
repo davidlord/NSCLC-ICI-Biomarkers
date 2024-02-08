@@ -14,15 +14,11 @@ def main(
     experiment_dir: Path,
     data_path: Optional[Path] = None
 ) -> None:
-    print('exp directory', experiment_dir)
     model_config_path = experiment_dir
-    print('model_config_path ', model_config_path)
     pathlist = os.path.dirname(model_config_path).split('/')[:-1]
     pathlist = ['/' if x == '' else x for x in pathlist]
-    print('pathlist', pathlist)
     output_path = os.path.join(*pathlist, "analysis" )
     model_path = os.path.join(*pathlist , "model")
-    print('model_path', model_path)
     analyser = Analyzer(
         analysis_config,
         model_config_path,
