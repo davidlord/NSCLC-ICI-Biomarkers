@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
-
-import git
 from ruamel.yaml import YAML
 
+import git
 
 def read_config(config_path: Path) -> dict:
     """Extract a configuration dict from a .yaml file.
@@ -53,11 +53,11 @@ def copy_config(config: dict, path_to_folder: Path, name) -> None:
         name -- The intended name of the configuration file.
     """
     assert (
-        path_to_folder.is_dir()
+        os.path.isdir(path_to_folder)
     ), f"Failed to save config file. {path_to_folder} is not a folder."
 
     # Save the configuration to disk.
-    with open(path_to_folder / f"{name}.yml", "w") as f:
+    with  open( os.path.join(path_to_folder ,f"{name}.yml"), "w") as f:
         yaml=YAML(typ='safe')
         yaml.dump(config, f)
 
@@ -90,15 +90,17 @@ def prepare_save_folder(
         The path to the prepared folder.
     """
     print("Creating output folders.")
-    output_dir = output_folder / f"{name}_{get_current_datetime()}"
+    output_dir = os.path.join(output_folder , name+'_'+get_current_datetime())
 
     # Create subfolders.
     for subfolder in subfolders:
-        create_directory(output_dir / subfolder)
+        create_directory(os.path.join( output_dir , subfolder))
 
     # Store configs.
     for config_name in configs.keys():
-        copy_config(configs[config_name], output_dir / "config", config_name)
+        print('config_name', config_name)
+        print('val' , configs[config_name])
+        copy_config(configs[config_name], os.path.join(output_dir, "config"), config_name)
 
     # Store git status.
    # save_git_status(output_dir)
