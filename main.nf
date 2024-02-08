@@ -11,7 +11,6 @@ if(!params.datatype) {
 }
 
 include { fetch_dataset } from './modules/fetch_dataset'
-include { visualize } from './modules/visualize'
 include { preprocess_datasets } from './modules/preprocess_datasets'
 include { train_data} from './modules/train_data'
 include { infer_from_data } from './modules/infer_from_data'
@@ -20,31 +19,31 @@ include { analyze_dataset } from './modules/analyze_dataset'
 log.info """\
         NSCLC-ICI pipeline
         ===============
-        fetch_datasets   : ${params.fetch_dataset}
-        dataset_names    : ${params.dataset_names}
-        datatype    : ${params.datatype}
+        fetch_datasets  : ${params.fetch_dataset}
+        dataset_names   : ${params.dataset_names}
+        datatype        : ${params.datatype}
 
         visualize	: ${params.visualize}
 
         mutations_data  : ${params.mutations_data}
 
         preprocess	: ${params.preprocess}
-        preproc_data :  ${params.preproc_data_folder}
-        remove_cols :  ${params.cols_to_remove}
-        model_type    : ${params.model_type}
+        preproc_data    : ${params.preproc_data_folder}
+        remove_cols     : ${params.cols_to_remove}
+        model_type      : ${params.model_type}
 
         train           : ${params.train}
 
         predict         : ${params.predict}
         predict_models  : ${params.predict_models}
-        predict_train    : ${params.predict_train}
+        predict_train   : ${params.predict_train}
         predict_test    : ${params.predict_test}
 
-        infer_outfile: ${params.infer_outfile}
+        experiment_name : ${params.exp_name}
 
         analyze         : ${params.analyze}
 
-        output_dir        : ${params.output_dir}
+        output_dir      : ${params.output_dir}
         """
         .stripIndent()
 
@@ -85,19 +84,13 @@ workflow {
         ch_config = Channel.fromPath("${params.output_dir}/configs/preprocess/*.yml")
     }
 
-    // visualize stats if input data sets
-    if ( params.visualize == true ) { 
-        visualize(ch_datasets) 
-        } 
-    // or dont 
-    else{    pass  } 
 
-    //  PRINT_PATH()
     // preprocess data sets
     if ( params.preprocess == true ) {
         // if preprocess of dataset needed for categorical processing, creating train/test sets
         (ch_preproc_config, ch_train_config, ch_train_data, ch_test_data)  = preprocess_datasets(ch_config, params.cols_to_remove, params.model_type ) 
         ch_train_config.view()
+       // PRINT_PATH()
     } // else load previously generated train, test sets
     else {
         ch_train_config = Channel.fromPath("${params.output_dir}/configs/preprocess/*.yml",  checkIfExists: true )
@@ -121,26 +114,36 @@ workflow {
         ch_train_model_config = Channel.fromPath("${params.output_dir}/configs/models/*.yml",  checkIfExists: true )
         ch_train_model_config.view()
         }
+    
+    train_conf = ch_train_model_config.collect()
+    test_data = ch_test_data.collect()
+    train_conf.view()
 
     // perform prediction and inference if specified
-    if ( params.predict == true ) {
-
-        (ch_infer_csv, ch_config_for_analysis) = infer_from_data(ch_train_model_config, ch_test_data, params.infer_outfile)
+    if ( params.predict == true && params.exp_name == "") {
+        output_name = Channel.of("${params.model_type}_prediction_inference.csv")
+        (ch_config_for_analysis, ch_infer_csv) = infer_from_data( ch_train_model_config.view() , params.exp_name , ch_test_data.view() , output_name)
         ch_config_for_analysis.view()
     }
     else{
-        ch_config_for_analysis = Channel.fromPath("${params.output_dir}/Modelling/output/models/*/config/*.yml",  checkIfExists: true )
-        ch_infer_csv = Channel.fromPath("${params.output_dir}/Modelling/output/models/*/inference/*.csv",  checkIfExists: true )
+        ch_config_for_analysis = Channel.fromPath("${params.output_dir}/Modelling/output/models/${params.exp_name}/config/*.yml",  checkIfExists: true )
+        ch_infer_csv = Channel.fromPath("${params.output_dir}/Modelling/output/models/${params.exp_name}/inference/*.csv",  checkIfExists: true )
         ch_config_for_analysis.view()
     }
-
+    
     // perform analysis if specified
-    if ( params.analyze == true ) {
-        = analyze_dataset(ch_config_for_analysis, ch_infer_csv)
+    if ( params.analyze == true && params.exp_name == "") {
+        ch_analysis_out  = analyze_dataset(ch_config_for_analysis , ch_train_model_config.view() , ch_infer_csv.view())
+        ch_analysis_out.view()
+    }
+    else if ( params.analyze == true && params.exp_name != "") {
+        ch_analysis_out  = analyze_dataset(ch_config_for_analysis , params.exp_name , ch_test_data.view())
+	ch_analysis_out.view()
     }
     else{
         "No analysis performed"
     }
+
 }
 
 /* 
