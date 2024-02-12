@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+import os
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -6,12 +9,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
-from src.dataloader import DataLoader
-from src.models import (KERAS_MODEL_NAME, XGBOOST_MODEL_NAME, KerasFeedForward,
+from dataloader import DataLoader
+from models import (KERAS_MODEL_NAME, XGBOOST_MODEL_NAME, KerasFeedForward,
                         XGBoost)
-from src.plots import (confusion_matrix, histogram, scatter_plot,
+from plots import (confusion_matrix, histogram, scatter_plot,
                        scatter_tsne_2d)
-from src.utils import prepare_save_folder, read_config
+from utils import prepare_save_folder, read_config
 
 
 class Analyzer:
@@ -88,7 +91,7 @@ class Analyzer:
         model = self._init_model(self.model_path)
         assert model.explain_weights, "Missing model weight explanation function."
         model.explain_weights()
-        with open(save_path / "analysis/model_weights_eli5.txt", "w") as f:
+        with open( os.path.join(save_path, "analysis/model_weights_eli5.txt"), "w") as f:
             print("Saving eli5 info.")
             f.write(model.explain_weights())
 
@@ -121,7 +124,7 @@ class Analyzer:
         )
         print(f"Saving '{output_name}.png' confusion_matrix plot.")
         plt.subplots_adjust(left=0.1, right=0.9, bottom=0.3, top=0.9)
-        plt.savefig(save_path / f"analysis/{output_name}.png")
+        plt.savefig( os.path.join(save_path , "analysis", output_name , ".png"))
 
     def _plot_scatter_plot(
         self,
@@ -150,7 +153,7 @@ class Analyzer:
         scatter_plot(df.dropna(), x_column, y_column, color_column, plotargs)
 
         print(f"Saving '{output_name}.png' scatter plot.")
-        plt.savefig(save_path / f"analysis/{output_name}.png", bbox_inches="tight")
+        plt.savefig( os.path.join(save_path, "analysis",output_name,".png"), bbox_inches="tight")
 
     def _plot_histogram(
         self,
@@ -176,7 +179,7 @@ class Analyzer:
         histogram(data[column].dropna(), type, plotargs)
 
         print(f"Saving '{output_name}.png' histogram.")
-        plt.savefig(save_path / f"analysis/{output_name}.png", bbox_inches="tight")
+        plt.savefig( os.path.join(save_path,"analysis", output_name,".png"), bbox_inches="tight")
 
     def _tsne_2d(
         self,
@@ -202,7 +205,7 @@ class Analyzer:
         scatter_tsne_2d(data, columns, groupby, plotargs)
 
         print(f"Saving '{output_name}' tnse 2d plot...")
-        plt.savefig(save_path / f"analysis/{output_name}.png", bbox_inches="tight")
+        plt.savefig( os.path.join(save_path, "analysis", output_name, ".png"), bbox_inches="tight")
 
     def _prepare_save_folder(self) -> Path:
         """Prepares a folder to store the metrics and plots in."""
@@ -236,7 +239,7 @@ class Analyzer:
         result["fscore"] = fscore
 
         # Save the result.
-        with open(save_path / "analysis/metrics.txt", "w") as f:
+        with open(os.path.join( save_path, "analysis/metrics.txt"), "w") as f:
             print("Saving metrics.")
             f.write(f"Metrics: {json.dumps(result, indent=0)}")
 

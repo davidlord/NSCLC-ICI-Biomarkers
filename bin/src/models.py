@@ -1,7 +1,11 @@
+#!/usr/bin/env python3
+
+
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Optional
 
+import os
 import eli5
 import numpy as np
 import pandas as pd
@@ -72,7 +76,7 @@ class XGBoost(BaseModel):
         self.config = config
 
         if model_dir_path:
-            print(f"Loading model from: {model_dir_path /self.MODEL_FILE_NAME}")
+            print(f"Loading model from: { os.path.join(model_dir_path , self.MODEL_FILE_NAME)}")
             self.model = self._load_model(model_dir_path)
         else:
             print("Creating new model.")
@@ -126,7 +130,7 @@ class XGBoost(BaseModel):
         Arguments:
             folder -- The path to the directory where the model will be saved.
         """
-        model_storage_path = directory / self.MODEL_FILE_NAME
+        model_storage_path = os.path.join(directory , self.MODEL_FILE_NAME)
         self.model.save_model(model_storage_path)
 
     def _load_model(self, model_dir_path: Path) -> Any:
@@ -138,8 +142,8 @@ class XGBoost(BaseModel):
         Returns:
             The loaded XGBoost model.
         """
-        model_path = model_dir_path / self.MODEL_FILE_NAME
-        assert model_path.is_file, f"ERROR: No model found at {model_path}"
+        model_path = os.path.join(model_dir_path , self.MODEL_FILE_NAME)
+        assert os.path.isfile(model_path), f"ERROR: No model found at {model_path}"
 
         model = xgb.XGBClassifier()
         booster = xgb.Booster()

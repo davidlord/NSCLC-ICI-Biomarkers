@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+
 import itertools
 import random
 from textwrap import wrap

@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -85,7 +88,7 @@ class Trainer:
         )
 
         # Save the model in the model directory.
-        self.model.save_model(output_dir / "model")
+        self.model.save_model(os.path.join(output_dir, "model"))
         print(f"Saved the model artifacts to {output_dir}")
 
     def _save_prediction(
